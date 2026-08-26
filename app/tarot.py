@@ -39,7 +39,7 @@ MAJOR_ARCANA: list[dict[str, Any]] = [
         "element": "Earth",
         "keywords": ["nurture", "sensuality", "abundance"],
         "traits": ["warm", "sensual", "creative"],
-        "love": "A love that wants to be fed, held, and grown.",
+        "love": "A love that wants to be tended — held, fed, and grown.",
     },
     {
         "id": 4,
@@ -191,17 +191,197 @@ CARD_BY_ID = {c["id"]: c for c in MAJOR_ARCANA}
 
 POSITIONS = ("past", "present", "future")
 POSITION_LABELS = {
-    "past": "Past Energy / Block",
-    "present": "Present Vibe",
-    "future": "Future Love Potential",
+    "en": {
+        "past": "Past",
+        "present": "Present",
+        "future": "Future",
+    },
+    "he": {
+        "past": "עבר",
+        "present": "הווה",
+        "future": "עתיד",
+    },
 }
 
 ARCHETYPE_BY_ELEMENT = {
-    "Fire": "The Alchemist of Passion",
-    "Water": "The Seeker of Depth",
-    "Air": "The Messenger of Choice",
-    "Earth": "The Keeper of Devotion",
+    "en": {
+        "Fire": "Fire · Passion",
+        "Water": "Water · Depth",
+        "Air": "Air · Choice",
+        "Earth": "Earth · Devotion",
+        "weaver": "The Weaver",
+        "phoenix": "The Phoenix",
+        "oracle": "The Oracle",
+    },
+    "he": {
+        "Fire": "אש · תשוקה",
+        "Water": "מים · עומק",
+        "Air": "אוויר · בחירה",
+        "Earth": "אדמה · מסירות",
+        "weaver": "האורג",
+        "phoenix": "עוף החול",
+        "oracle": "האורקל",
+    },
 }
+
+ELEMENT_HE = {"Fire": "אש", "Water": "מים", "Air": "אוויר", "Earth": "אדמה"}
+
+HE_CARDS = {
+    0: {"name": "הכסיל", "love": "ניצוץ ראשון שמבקש אומץ יותר מוודאות.", "traits": ["הרפתקני", "לב פתוח", "נטול משא"]},
+    1: {"name": "הקוסם", "love": "כימיה שאפשר ממש לעצב למשהו אמיתי.", "traits": ["כריזמטי", "ממוקד", "תושייה"]},
+    2: {"name": "הכהנת הגדולה", "love": "משיכה שחיה במבטים, בחלומות ובתזמון.", "traits": ["אינטואיטיבי", "שמור", "מגנטי"]},
+    3: {"name": "הקיסרית", "love": "אהבה שרוצה מגע, חום, ומי שמשקיע.", "traits": ["חמים", "חושני", "יצירתי"]},
+    4: {"name": "הקיסר", "love": "ביטחון כשפת אהבה — עמוד שדרה לתשוקה.", "traits": ["יציב", "מגן", "החלטי"]},
+    5: {"name": "הכהן הגדול", "love": "קשר שרוצה טקס, ערכים משותפים וצורה שנשארת.", "traits": ["נאמן", "עקרוני", "מסור"]},
+    6: {"name": "המאהבים", "love": "צומת בדרך: בחרו בלב, לא בהמון.", "traits": ["רומנטי", "מבחין", "מסור"]},
+    7: {"name": "המרכבה", "love": "תנופה — שני רצונות לומדים לנוע כאחד.", "traits": ["נחוש", "שאפתן", "בעל נוכחות"]},
+    8: {"name": "העוצמה", "love": "תשוקה שמרוסנת בחסד, לא בריחוק.", "traits": ["עדין", "אמיץ", "רחום"]},
+    9: {"name": "הנזיר", "love": "חיבור אחרי היכרות עצמית — איכות מעל רעש.", "traits": ["מהורהר", "עצמאי", "כן"]},
+    10: {"name": "גלגל המזל", "love": "מפגש שמרגיש מתואם על ידי משהו גדול יותר.", "traits": ["גמיש", "אופטימי", "ייעודי"]},
+    11: {"name": "הצדק", "love": "שווים ליד השולחן — בלי משחקים, רק אמת.", "traits": ["הוגן", "צלול", "ישר"]},
+    12: {"name": "התלוי", "love": "לשחרר את התסריט הישן כדי שחדש יוכל להגיע.", "traits": ["סבלני", "פילוסופי", "לא שגרתי"]},
+    13: {"name": "המוות", "love": "מה שחייב להסתיים כדי שאינטימיות אמיתית יותר תתחיל.", "traits": ["משנה צורה", "כן", "מחדש"]},
+    14: {"name": "המתינות", "love": "שתי כימיות שמתערבבות עד שנוצר משהו חדש.", "traits": ["מאוזן", "מרפא", "משלב"]},
+    15: {"name": "השטן", "love": "משיכה גולמית — מגנטיות שמבקשת להפוך למודעת.", "traits": ["עז", "חושני", "מעורר"]},
+    16: {"name": "המגדל", "love": "מכת כנות שמפנה קרקע לאש אמיתית.", "traits": ["מזרז", "דובר אמת", "משחרר"]},
+    17: {"name": "הכוכב", "love": "אור רך אחרי סערה — אהבה שמחזירה אמון.", "traits": ["מלא תקווה", "אותנטי", "מעורר השראה"]},
+    18: {"name": "הירח", "love": "כימיה לילית — רגשות שמדברים בסמלים.", "traits": ["דמיוני", "רגשי", "חידתי"]},
+    19: {"name": "השמש", "love": "חום בלי הסתרה — שמחה כנקודת האיחוד.", "traits": ["זוהר", "שובב", "נדיב"]},
+    20: {"name": "המשפט", "love": "הזדמנות שנייה שמרגישה כמו תשובה של גורל.", "traits": ["ער", "תכליתי", "סולח"]},
+    21: {"name": "העולם", "love": "תחושת הגעה — שני חיים שנכנסים למפה גדולה יותר.", "traits": ["שלם", "קוסמופוליטי", "ממומש"]},
+}
+
+
+def normalize_lang(raw: str | None) -> str:
+    if raw and str(raw).lower().startswith("he"):
+        return "he"
+    return "en"
+
+
+def card_payload(card_id: int, lang: str = "en") -> dict[str, Any]:
+    card = CARD_BY_ID[card_id]
+    he = HE_CARDS[card_id]
+    if lang == "he":
+        return {
+            "id": card["id"],
+            "name": he["name"],
+            "element": ELEMENT_HE[card["element"]],
+            "element_key": card["element"],
+            "keywords": card["keywords"],
+            "traits": he["traits"],
+            "love": he["love"],
+        }
+    return {
+        "id": card["id"],
+        "name": card["name"],
+        "element": card["element"],
+        "element_key": card["element"],
+        "keywords": card["keywords"],
+        "traits": card["traits"],
+        "love": card["love"],
+    }
+
+
+def dominant_element(cards: list[dict[str, Any]]) -> str:
+    counts: dict[str, int] = {}
+    for card in cards:
+        key = card.get("element_key") or card["element"]
+        counts[key] = counts.get(key, 0) + 1
+    return max(counts, key=counts.get)
+
+
+def interpret_spread(card_ids: list[int], lang: str = "en") -> dict[str, Any]:
+    lang = normalize_lang(lang)
+    if len(card_ids) != 3 or len(set(card_ids)) != 3:
+        raise ValueError(
+            "יש לבחור בדיוק שלושה קלפי ארקנה ראשית שונים."
+            if lang == "he"
+            else "Select exactly three distinct Major Arcana cards."
+        )
+    for cid in card_ids:
+        if cid not in CARD_BY_ID:
+            raise ValueError(f"Unknown card id: {cid}")
+
+    drawn = [card_payload(cid, lang) for cid in card_ids]
+    element_key = dominant_element(drawn)
+    traits = []
+    for card in drawn:
+        for trait in card["traits"]:
+            if trait not in traits:
+                traits.append(trait)
+
+    names = ARCHETYPE_BY_ELEMENT[lang]
+    archetype = names[element_key]
+    if drawn[2]["id"] in (6, 14, 21):
+        archetype = names["weaver"]
+    elif drawn[0]["id"] in (13, 16, 15):
+        archetype = names["phoenix"]
+    elif drawn[1]["id"] in (2, 18, 9):
+        archetype = names["oracle"]
+
+    labels = POSITION_LABELS[lang]
+    spread = []
+    for pos, card in zip(POSITIONS, drawn):
+        spread.append({"position": pos, "label": labels[pos], "card": card})
+
+    past, present, future = drawn
+    if lang == "he":
+        interpretation = (
+            f"{labels['past']}: {past['name']} — {past['love']} "
+            f"{labels['present']}: {present['name']} — {present['love']} "
+            f"{labels['future']}: {future['name']} — {future['love']}"
+        )
+        el_word = ELEMENT_HE[element_key]
+        profile = (
+            f"הקריאה: {archetype}. יסוד {el_word}, מתוך "
+            f"{past['name']}, {present['name']} ו{future['name']}. "
+            f"התאמה טובה תרגיש כמו {traits[0]} שנפגש עם {traits[1]} — "
+            f"כימיה שמעדיפה כנות על הצגה."
+        )
+        element_out = el_word
+    else:
+        interpretation = (
+            f"{labels['past']}: {past['name']} — {past['love']} "
+            f"{labels['present']}: {present['name']} — {present['love']} "
+            f"{labels['future']}: {future['name']} — {future['love']}"
+        )
+        profile = (
+            f"Your reading: {archetype}. An {element_key.lower()} signature from "
+            f"{past['name']}, {present['name']}, and {future['name']}. "
+            f"A good match will feel {traits[0]} meeting {traits[1]} — "
+            f"chemistry that prefers honesty over performance."
+        )
+        element_out = element_key
+
+    energy_signature = {
+        "archetype": archetype,
+        "element": element_out,
+        "element_key": element_key,
+        "traits": traits[:6],
+        "card_ids": card_ids,
+        "card_names": [c["name"] for c in drawn],
+    }
+    last_spread = {
+        "cards": spread,
+        "interpretation": interpretation,
+        "profile": profile,
+        "source": "local-oracle",
+        "lang": lang,
+    }
+
+    enriched = _maybe_llm_interpret(energy_signature, last_spread, lang)
+    return enriched
+
+
+def localize_user(user: dict[str, Any], lang: str = "en") -> dict[str, Any]:
+    ids = (user.get("energy_signature") or {}).get("card_ids")
+    if not ids:
+        return user
+    reading = interpret_spread(ids, lang=lang)
+    out = dict(user)
+    out["energy_signature"] = reading["energy_signature"]
+    out["last_spread"] = reading["last_spread"]
+    return out
 
 ELEMENT_SCORE = {
     ("Fire", "Fire"): 88,
@@ -217,90 +397,7 @@ ELEMENT_SCORE = {
 }
 
 
-def card_payload(card_id: int) -> dict[str, Any]:
-    card = CARD_BY_ID[card_id]
-    return {
-        "id": card["id"],
-        "name": card["name"],
-        "element": card["element"],
-        "keywords": card["keywords"],
-        "traits": card["traits"],
-        "love": card["love"],
-    }
-
-
-def dominant_element(cards: list[dict[str, Any]]) -> str:
-    counts: dict[str, int] = {}
-    for card in cards:
-        counts[card["element"]] = counts.get(card["element"], 0) + 1
-    return max(counts, key=counts.get)
-
-
-def interpret_spread(card_ids: list[int]) -> dict[str, Any]:
-    if len(card_ids) != 3 or len(set(card_ids)) != 3:
-        raise ValueError("Select exactly three distinct Major Arcana cards.")
-    for cid in card_ids:
-        if cid not in CARD_BY_ID:
-            raise ValueError(f"Unknown card id: {cid}")
-
-    drawn = [card_payload(cid) for cid in card_ids]
-    element = dominant_element(drawn)
-    traits = []
-    for card in drawn:
-        for trait in card["traits"]:
-            if trait not in traits:
-                traits.append(trait)
-
-    archetype = ARCHETYPE_BY_ELEMENT[element]
-    if drawn[2]["id"] in (6, 14, 21):
-        archetype = "The Weaver of Destined Bonds"
-    elif drawn[0]["id"] in (13, 16, 15):
-        archetype = "The Phoenix of Desire"
-    elif drawn[1]["id"] in (2, 18, 9):
-        archetype = "The Oracle of Intimacy"
-
-    spread = []
-    for pos, card in zip(POSITIONS, drawn):
-        spread.append(
-            {
-                "position": pos,
-                "label": POSITION_LABELS[pos],
-                "card": card,
-            }
-        )
-
-    past, present, future = drawn
-    interpretation = (
-        f"Your {POSITION_LABELS['past'].lower()} is {past['name']} — {past['love']} "
-        f"In the present, {present['name']} colors your field: {present['love']} "
-        f"Ahead, {future['name']} opens the path: {future['love']}"
-    )
-    profile = (
-        f"You arrive as {archetype}, an {element.lower()} signature woven from "
-        f"{past['name']}, {present['name']}, and {future['name']}. "
-        f"Those who match you will feel {traits[0]} heat meeting {traits[1]} grace — "
-        f"a romance that prefers truth over performance."
-    )
-
-    energy_signature = {
-        "archetype": archetype,
-        "element": element,
-        "traits": traits[:6],
-        "card_ids": card_ids,
-        "card_names": [c["name"] for c in drawn],
-    }
-    last_spread = {
-        "cards": spread,
-        "interpretation": interpretation,
-        "profile": profile,
-        "source": "local-oracle",
-    }
-
-    enriched = _maybe_llm_interpret(energy_signature, last_spread)
-    return enriched
-
-
-def _maybe_llm_interpret(signature: dict[str, Any], spread: dict[str, Any]) -> dict[str, Any]:
+def _maybe_llm_interpret(signature: dict[str, Any], spread: dict[str, Any], lang: str = "en") -> dict[str, Any]:
     api_key = os.getenv("OPENAI_API_KEY", "").strip()
     if not api_key:
         return {"energy_signature": signature, "last_spread": spread}
@@ -313,9 +410,11 @@ def _maybe_llm_interpret(signature: dict[str, Any], spread: dict[str, Any]) -> d
             {
                 "role": "system",
                 "content": (
-                    "You are a romantic-mystical tarot interpreter for a dating app. "
+                    "You are a tarot interpreter for a dating app. "
                     "Reply JSON only with keys: archetype, profile, interpretation. "
-                    "Keep profile under 80 words. Tone: sleek, intimate, never cheesy."
+                    "Keep profile under 80 words. Tone: mystical but readable, like a real dating product. "
+                    "Avoid theatrical words like veil, seekers, or bound. "
+                    f"Write in {'Hebrew' if lang == 'he' else 'English'}."
                 ),
             },
             {
@@ -354,9 +453,10 @@ def _maybe_llm_interpret(signature: dict[str, Any], spread: dict[str, Any]) -> d
     return {"energy_signature": signature, "last_spread": spread}
 
 
-def compatibility(a: dict[str, Any], b: dict[str, Any]) -> tuple[float, str]:
-    el_a = a.get("element", "Air")
-    el_b = b.get("element", "Air")
+def compatibility(a: dict[str, Any], b: dict[str, Any], lang: str = "en") -> tuple[float, str]:
+    lang = normalize_lang(lang)
+    el_a = a.get("element_key") or a.get("element", "Air")
+    el_b = b.get("element_key") or b.get("element", "Air")
     key = tuple(sorted((el_a, el_b)))
     base = float(ELEMENT_SCORE.get(key, 75))
 
@@ -376,17 +476,24 @@ def compatibility(a: dict[str, Any], b: dict[str, Any]) -> tuple[float, str]:
         base += 4
 
     score = max(62.0, min(99.0, round(base, 1)))
-    reason = (
-        f"{a.get('archetype', 'Your field')} ( {el_a} ) meets "
-        f"{b.get('archetype', 'their field')} ( {el_b} ). "
-        f"Their cards do not copy yours — they complete the missing polarity, "
-        f"so the pull feels fated rather than familiar."
-    )
-    llm_reason = _maybe_llm_compat(a, b, score)
+    if lang == "he":
+        reason = (
+            f"החיבור בין {a.get('archetype', 'הקריאה שלך')} "
+            f"({ELEMENT_HE.get(el_a, el_a)}) ל{b.get('archetype', 'הקריאה שלהם')} "
+            f"({ELEMENT_HE.get(el_b, el_b)}). "
+            f"הקלפים לא מעתיקים אחד את השני — הם משלימים. מכאן המשיכה."
+        )
+    else:
+        reason = (
+            f"{a.get('archetype', 'Your reading')} ({el_a}) meets "
+            f"{b.get('archetype', 'their reading')} ({el_b}). "
+            f"The cards don't copy each other — they complement. That's the spark."
+        )
+    llm_reason = _maybe_llm_compat(a, b, score, lang)
     return score, llm_reason or reason
 
 
-def _maybe_llm_compat(a: dict[str, Any], b: dict[str, Any], score: float) -> str | None:
+def _maybe_llm_compat(a: dict[str, Any], b: dict[str, Any], score: float, lang: str = "en") -> str | None:
     api_key = os.getenv("OPENAI_API_KEY", "").strip()
     if not api_key:
         return None
@@ -398,8 +505,9 @@ def _maybe_llm_compat(a: dict[str, Any], b: dict[str, Any], score: float) -> str
             {
                 "role": "system",
                 "content": (
-                    "Write exactly two sentences of Cosmic Connection Insight for a dating match. "
-                    "Romantic-mystical, specific to the cards, no hashtags."
+                    "Write exactly two sentences explaining why these two tarot readings match. "
+                    "Mystical but readable, specific to the cards, no hashtags, not theatrical. "
+                    f"Write in {'Hebrew' if lang == 'he' else 'English'}."
                 ),
             },
             {

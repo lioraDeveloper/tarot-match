@@ -8,3 +8,8 @@ venv/
 *.db-wal
 .idea/
 .vscode/
+static/uploads/*
+!static/uploads/oracle.svg
+!static/uploads/.gitkeep
+!static/uploads/portraits/
+!static/uploads/portraits/*.svg

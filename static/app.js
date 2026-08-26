@@ -10,6 +10,9 @@ function detectLang() {
 const state = {
   user: null,
   match: null,
+  conversations: [],
+  unreadTotal: 0,
+  discover: [],
   deck: [],
   selected: [],
   shuffling: false,
@@ -20,6 +23,8 @@ const state = {
   view: "landing",
   ws: null,
   lang: detectLang(),
+  pollId: null,
+  mobileThread: false,
 };
 
 const $app = document.getElementById("app");
@@ -49,34 +54,79 @@ function applyDir() {
 
 function localizeError(msg) {
   const map = {
-    "Sign in to enter the chamber.": {
-      he: "יש להיכנס כדי להיכנס לחדר.",
-    },
-    "Session expired.": { he: "פג תוקף החיבור." },
+    "Sign in to continue.": { he: "צריך להתחבר כדי להמשיך." },
+    "Sign in to enter the chamber.": { he: "צריך להתחבר כדי להמשיך." },
+    "Session expired. Sign in again.": { he: "פג תוקף החיבור. צריך להיכנס שוב." },
+    "Session expired.": { he: "פג תוקף החיבור. צריך להיכנס שוב." },
     "Birth date must be YYYY-MM-DD.": { he: "תאריך לידה בפורמט YYYY-MM-DD." },
-    "You must be 18 or older to join.": { he: "יש להיות בני 18 ומעלה כדי להצטרף." },
+    "You must be 18 or older to join.": { he: "ההרשמה מותרת מגיל 18 ומעלה." },
     "Birth date cannot be in the future.": { he: "תאריך לידה לא יכול להיות בעתיד." },
+    "The age range is backwards.": { he: "טווח הגילים הפוך." },
     "Age range is inverted.": { he: "טווח הגילים הפוך." },
     "That email already has a profile.": { he: "לאימייל הזה כבר יש פרופיל." },
-    "Email or password did not match.": { he: "אימייל או סיסמה לא התאימו." },
+    "Email or password did not match.": { he: "אימייל או סיסמה לא נכונים." },
     "Select exactly three distinct Major Arcana cards.": { he: "יש לבחור בדיוק שלושה קלפי ארקנה ראשית שונים." },
-    "Thread not found.": { he: "השרשור לא נמצא." },
-    "This connection is closed.": { he: "החיבור הזה נסגר." },
-    "Not your thread.": { he: "זה לא השרשור שלך." },
+    "Chat not found.": { he: "השיחה לא נמצאה." },
+    "Thread not found.": { he: "השיחה לא נמצאה." },
+    "This chat is closed.": { he: "השיחה הזאת נסגרה." },
+    "This connection is closed.": { he: "השיחה הזאת נסגרה." },
+    "That's not your chat.": { he: "זאת לא השיחה שלך." },
+    "Not your thread.": { he: "זאת לא השיחה שלך." },
+    "Please choose a photo (JPG, PNG, WEBP, or GIF).": { he: t("notImage") },
+    "Photo must be under 5 MB.": { he: t("photoTooBig") },
+    "Add a message or a photo.": { he: "צריך הודעה או תמונה." },
+    "That profile isn't available.": { he: "הפרופיל הזה לא זמין." },
+    "Draw your cards first — then you can browse people.": { he: t("needDraw") },
   };
   if (state.lang === "he" && map[msg]?.he) return map[msg].he;
-  if (state.lang === "he" && msg && msg.startsWith("Free seekers may redraw")) {
+  if (state.lang === "he" && msg && (msg.startsWith("Free accounts can redraw") || msg.startsWith("Free seekers may redraw"))) {
     return msg
-      .replace("Free seekers may redraw once per week. Next opening in ~", "מחפשים חופשיים יכולים למשוך מחדש פעם בשבוע. הפתיחה הבאה בעוד כ־")
-      .replace("h. Premium unlocks unlimited rituals.", " שעות. פרימיום פותח טקסים ללא הגבלה.");
+      .replace("Free accounts can redraw every 5 minutes. Next draw in about ", "בחשבון חינמי אפשר לקרוא מחדש כל 5 דקות. הפתיחה הבאה בעוד כ־")
+      .replace("Free accounts can redraw once a week. Next draw in about ", "בחשבון חינמי אפשר לקרוא מחדש כל 5 דקות. הפתיחה הבאה בעוד כ־")
+      .replace("Free seekers may redraw once per week. Next opening in ~", "בחשבון חינמי אפשר לקרוא מחדש כל 5 דקות. הפתיחה הבאה בעוד כ־")
+      .replace(" min. Premium removes the wait.", " דקות. בפרימיום אין המתנה.")
+      .replace("h. Premium removes the wait.", " דקות. בפרימיום אין המתנה.")
+      .replace("h. Premium unlocks unlimited rituals.", " דקות. בפרימיום אין המתנה.");
   }
   return msg;
 }
 
+function shuffleDeck() {
+  const deck = (state.deck || []).slice();
+  for (let i = deck.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [deck[i], deck[j]] = [deck[j], deck[i]];
+  }
+  state.deck = deck;
+}
+
+function openChamber() {
+  state.selected = [];
+  state.revealed = false;
+  state.error = "";
+  shuffleDeck();
+  state.view = "chamber";
+  render();
+}
+
 function navigate(view) {
+  if (view === "chamber") {
+    openChamber();
+    return;
+  }
   state.view = view;
   state.error = "";
+  if (view !== "chat") state.mobileThread = false;
   render();
+  if (view === "discover") loadDiscover();
+  if (view === "chat") {
+    (async () => {
+      await refreshInbox();
+      const threadVisible = state.mobileThread || window.matchMedia("(min-width: 900px)").matches;
+      if (state.match && threadVisible) await loadChat(state.match.id);
+      if (state.view === "chat") render();
+    })();
+  }
 }
 
 async function setLang(lang) {
@@ -85,16 +135,9 @@ async function setLang(lang) {
   applyDir();
   if (state.user) {
     try {
-      const me = await api("/api/me");
-      state.user = me.user;
-      state.match = me.active_match;
-      if (state.reading && state.user.last_spread) {
-        state.reading = {
-          energy_signature: state.user.energy_signature,
-          last_spread: state.user.last_spread,
-        };
-      }
+      await hydrateMe();
       if (state.view === "chat" && state.match) await loadChat(state.match.id);
+      if (state.view === "discover") await loadDiscover();
     } catch {
       /* stay on current view */
     }
@@ -103,14 +146,15 @@ async function setLang(lang) {
 }
 
 async function api(path, opts = {}) {
+  const extra = opts.headers || {};
+  const headers = { "X-Lang": state.lang, ...extra };
+  const isForm = opts.body instanceof FormData;
+  if (!isForm) headers["Content-Type"] = extra["Content-Type"] || "application/json";
+  else delete headers["Content-Type"];
   const res = await fetch(path, {
     credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Lang": state.lang,
-      ...(opts.headers || {}),
-    },
     ...opts,
+    headers,
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
@@ -121,17 +165,40 @@ async function api(path, opts = {}) {
   return data;
 }
 
+function applyMe(me) {
+  state.user = me.user;
+  state.conversations = me.conversations || [];
+  state.unreadTotal = me.unread_total || 0;
+  if (state.match) {
+    const still = state.conversations.find((c) => c.id === state.match.id);
+    if (still) state.match = still;
+  } else if (me.active_match) {
+    state.match = me.active_match;
+  }
+}
+
+async function hydrateMe() {
+  const me = await api("/api/me");
+  applyMe(me);
+  if (state.reading && state.user.last_spread) {
+    state.reading = {
+      energy_signature: state.user.energy_signature,
+      last_spread: state.user.last_spread,
+    };
+  }
+  return me;
+}
+
 async function boot() {
   applyDir();
+  startPolling();
   try {
-    const me = await api("/api/me");
-    state.user = me.user;
-    state.match = me.active_match;
+    const me = await hydrateMe();
     const deck = await api("/api/tarot/deck");
     state.deck = deck.cards;
     if (!state.user.energy_signature) navigate("chamber");
-    else if (state.match) navigate("chat");
-    else navigate("profile");
+    else if ((me.unread_total || 0) > 0 || (me.conversations || []).length) navigate("chat");
+    else navigate("discover");
   } catch {
     const deck = await api("/api/tarot/deck");
     state.deck = deck.cards;
@@ -143,6 +210,28 @@ function esc(s) {
   return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
 
+function initials(name) {
+  const parts = String(name || "?").trim().split(/\s+/);
+  const letters = (parts[0]?.[0] || "?") + (parts[1]?.[0] || "");
+  return letters.toUpperCase();
+}
+
+function avatarHtml(person, cls = "") {
+  const url = person?.photo_url;
+  const name = person?.name || "";
+  if (url) {
+    return `<img class="avatar ${cls}" src="${esc(url)}" alt="${esc(name)}" />`;
+  }
+  const extra = person?.is_bot ? " avatar-bot" : "";
+  return `<div class="avatar avatar-fallback ${cls}${extra}" aria-hidden="true">${esc(initials(name))}</div>`;
+}
+
+function unreadBadge(n) {
+  const count = Number(n) || 0;
+  if (count <= 0) return "";
+  return `<span class="badge">${count > 9 ? "9+" : count}</span>`;
+}
+
 function langSwitch() {
   return `<div class="lang-switch" role="group" aria-label="Language">
     <button type="button" class="${state.lang === "en" ? "on" : ""}" data-lang="en">EN</button>
@@ -151,10 +240,12 @@ function langSwitch() {
 }
 
 function navBar() {
+  const unread = unreadBadge(state.unreadTotal);
   const links = state.user
     ? `<button class="link" data-go="chamber">${esc(t("navChamber"))}</button>
+       <button class="link" data-go="discover">${esc(t("navDiscover"))}</button>
        <button class="link" data-go="profile">${esc(t("navProfile"))}</button>
-       ${state.match ? `<button class="link" data-go="chat">${esc(t("navChat"))}</button>` : ""}
+       <button class="link" data-go="chat">${esc(t("navChat"))}${unread}</button>
        <button class="link" id="logout">${esc(t("navLeave"))}</button>`
     : "";
   return `<header class="nav">
@@ -227,7 +318,10 @@ function cardButton(c) {
   const dim = state.selected.length >= 3 && !sel;
   const revealed = state.revealed && sel;
   return `<button type="button" class="arcana ${sel ? "selected" : ""} ${dim ? "dim" : ""} ${revealed ? "revealed" : ""}" data-card="${c.id}" aria-label="${esc(cardName(c.id))}">
-    <div class="face back"></div>
+    <div class="face back">
+      <span class="back-roman">${ROMAN[c.id]}</span>
+      <div class="back-art" aria-hidden="true">${CARD_SVG[c.id]}</div>
+    </div>
     <div class="face front">
       <div class="roman">${ROMAN[c.id]}</div>
       ${CARD_SVG[c.id]}
@@ -275,42 +369,120 @@ function readingView() {
     <div class="card-panel match-hero">
       ${match ? `
         <p class="hero-kicker">${esc(t("instantConnection"))}</p>
-        <div class="score">${Math.round(match.compatibility_score)}%</div>
-        <h3>${esc(match.partner.name)}, ${match.partner.age}</h3>
+        <div class="match-top">${avatarHtml(match.partner, "avatar-lg")}<div>
+          <div class="score">${Math.round(match.compatibility_score)}%</div>
+          <h3>${esc(match.partner.name)}, ${match.partner.age}</h3>
+        </div></div>
         <p class="insight">${esc(match.mystical_reasoning)}</p>
         <p class="muted">${esc(match.partner.bio)}</p>
-        <div class="actions"><button class="primary" data-go="chat">${esc(t("openChannel"))}</button></div>
+        <div class="actions">
+          <button class="primary" data-open-chat="${esc(match.id)}">${esc(t("openChannel"))}</button>
+          <button class="ghost" data-go="discover">${esc(t("discoverMore"))}</button>
+        </div>
       ` : `<p>${esc(t("noMatch"))}</p>
-        <button class="ghost" data-go="profile">${esc(t("adjustPrefs"))}</button>`}
+        <div class="actions">
+          <button class="primary" data-go="discover">${esc(t("discoverMore"))}</button>
+          <button class="ghost" data-go="profile">${esc(t("adjustPrefs"))}</button>
+        </div>`}
     </div>
   </div>`;
 }
 
+function previewText(conv) {
+  const last = conv.last_message;
+  if (!last) return conv.partner?.is_bot ? t("trialBot") : "…";
+  if (last.image_url && !last.content) return "📷";
+  if (last.image_url) return "📷 " + last.content;
+  return last.content || conv.last_preview || "…";
+}
+
+function inboxItem(conv) {
+  const p = conv.partner || {};
+  const active = state.match && state.match.id === conv.id;
+  return `<button type="button" class="inbox-item ${active ? "on" : ""}" data-open-chat="${esc(conv.id)}">
+    ${avatarHtml(p)}
+    <span class="inbox-copy">
+      <span class="inbox-name">${esc(p.name)}${p.is_bot ? ` <em>${esc(t("trialBot"))}</em>` : ""}</span>
+      <span class="inbox-preview">${esc(previewText(conv))}</span>
+    </span>
+    <span class="inbox-meta">
+      <span class="gold inbox-score">${Math.round(conv.compatibility_score)}%</span>
+      ${unreadBadge(conv.unread)}
+    </span>
+  </button>`;
+}
+
+function bubbleHtml(msg) {
+  const mine = msg.sender_id === state.user.id;
+  const img = msg.image_url
+    ? `<img class="bubble-photo" src="${esc(msg.image_url)}" alt="${esc(t("photoAlt"))}" />`
+    : "";
+  const text = msg.content ? `<span>${esc(msg.content)}</span>` : "";
+  return `<div class="bubble ${mine ? "me" : "them"}">${img}${text}</div>`;
+}
+
 function chatView() {
+  const list = state.conversations.map(inboxItem).join("") || `<p class="muted">${esc(t("inboxEmpty"))}</p>`;
   const m = state.match;
-  if (!m) return `${navBar()}<div class="shell"><p>${esc(t("noActiveMatch"))}</p></div>`;
-  const bubbles = state.messages.map((msg) => {
-    const mine = msg.sender_id === state.user.id;
-    return `<div class="bubble ${mine ? "me" : "them"}">${esc(msg.content)}</div>`;
-  }).join("");
-  return `${navBar()}<div class="shell layout-chat">
-    <div class="sidebar">
-      <div class="card-panel">
-        <p class="hero-kicker">${esc(t("boundWith"))}</p>
-        <h3>${esc(m.partner.name)}</h3>
-        <p class="gold">${Math.round(m.compatibility_score)}% ${esc(t("alignment"))}</p>
-        <p class="muted">${esc(m.partner.energy_signature?.archetype || "")}</p>
+  const showThread = Boolean(m) && (state.mobileThread || window.matchMedia("(min-width: 900px)").matches);
+  let thread = `<div class="card-panel thread thread-empty"><p class="muted">${esc(t("pickChat"))}</p></div>`;
+  if (m && showThread) {
+    const p = m.partner || {};
+    const bubbles = state.messages.map(bubbleHtml).join("");
+    thread = `<div class="card-panel thread">
+      <div class="chat-head">
+        <button type="button" class="link back-chats" id="back-chats">${esc(t("inboxTitle"))}</button>
+        ${avatarHtml(p)}
+        <div class="chat-head-copy">
+          <strong>${esc(p.name)}</strong>
+          <span class="gold">${Math.round(m.compatibility_score)}% ${esc(t("alignment"))}</span>
+        </div>
+        <button type="button" class="ghost small" id="unmatch">${esc(t("unmatch"))}</button>
       </div>
-      ${adSlot()}
-    </div>
-    <div class="card-panel thread">
-      <div class="pin"><strong>${esc(t("cosmicInsight"))}</strong> ${esc(m.mystical_reasoning)}</div>
+      <div class="pin"><strong>${esc(t("cosmicInsight"))}</strong> ${esc(m.mystical_reasoning || "")}</div>
       <div class="msgs" id="msgs">${bubbles || `<p class="muted">${esc(t("firstWord"))}</p>`}</div>
       <form class="composer" id="send-form">
+        <label class="icon-btn" title="${esc(t("sendPhoto"))}">
+          <input type="file" id="chat-photo" accept="image/jpeg,image/png,image/webp,image/gif" hidden />
+          <span>＋</span>
+        </label>
         <input name="content" autocomplete="off" placeholder="${esc(t("chatPlaceholder"))}" maxlength="2000" />
         <button class="primary" type="submit">${esc(t("send"))}</button>
       </form>
+    </div>`;
+  }
+  return `${navBar()}<div class="shell layout-chat ${showThread ? "thread-open" : ""}">
+    <div class="sidebar inbox-pane">
+      <div class="card-panel inbox">
+        <p class="hero-kicker">${esc(t("inboxTitle"))}</p>
+        <div class="inbox-list">${list}</div>
+      </div>
+      ${adSlot()}
     </div>
+    ${thread}
+  </div>`;
+}
+
+function discoverView() {
+  const cards = state.discover.map((item) => {
+    const u = item.user;
+    const cta = item.already_chatting ? t("openChat") : t("messageCta");
+    return `<article class="person-card">
+      ${avatarHtml(u, "avatar-xl")}
+      <div class="person-score">${Math.round(item.compatibility_score)}%</div>
+      <h3>${esc(u.name)}${t("yearsOld") ? `, ${u.age} ${esc(t("yearsOld"))}` : `, ${u.age}`}</h3>
+      <p class="gold">${esc(u.energy_signature?.archetype || "")}</p>
+      <p class="muted person-bio">${esc(u.bio || "")}</p>
+      ${u.is_bot ? `<p class="pill">${esc(t("trialBot"))}</p>` : ""}
+      <button class="primary" data-message="${esc(u.id)}">${esc(cta)}</button>
+    </article>`;
+  }).join("");
+  return `${navBar()}<div class="shell">
+    <p class="hero-kicker">${esc(t("discoverKicker"))}</p>
+    <h1>${esc(t("discoverTitle"))}</h1>
+    <p class="muted">${esc(t("discoverBody"))}</p>
+    <p class="error">${esc(state.error)}</p>
+    <div class="discover-grid">${cards || `<p class="muted">${esc(t("noMatch"))}</p>`}</div>
   </div>`;
 }
 
@@ -321,8 +493,18 @@ function profileView() {
   return `${navBar()}<div class="shell grid-2">
     <div class="card-panel">
       <p class="hero-kicker">${esc(t("yourField"))}</p>
-      <h2>${esc(u.name)}, ${u.age}</h2>
-      ${sig ? `<p class="gold">${esc(sig.archetype)}</p><p class="muted">${esc((sig.traits || []).join(" · "))} · ${esc(elementName(sig.element))}</p>` : `<p class="muted">${esc(t("noReading"))}</p>`}
+      <div class="profile-head">
+        ${avatarHtml(u, "avatar-xl")}
+        <div>
+          <h2>${esc(u.name)}, ${u.age}</h2>
+          ${sig ? `<p class="gold">${esc(sig.archetype)}</p><p class="muted">${esc((sig.traits || []).join(" · "))} · ${esc(elementName(sig.element))}</p>` : `<p class="muted">${esc(t("noReading"))}</p>`}
+        </div>
+      </div>
+      <form id="photo-form">
+        <label>${esc(u.photo_url ? t("changePhoto") : t("uploadPhoto"))}</label>
+        <input type="file" id="profile-photo" accept="image/jpeg,image/png,image/webp,image/gif" />
+        <p class="muted photo-hint">${esc(t("photoHint"))}</p>
+      </form>
       <form id="pref-form">
         <label>${esc(t("name"))}</label><input name="name" value="${esc(u.name)}" />
         <label>${esc(t("bio"))}</label><textarea name="bio">${esc(u.bio)}</textarea>
@@ -335,7 +517,7 @@ function profileView() {
         <div class="check-row">
           ${["woman","man","nonbinary","any"].map((g) => `<label><input type="checkbox" name="looking" value="${g}" ${u.looking_for_gender.includes(g) ? "checked" : ""} /> ${esc(genderLabel[g])}</label>`).join("")}
         </div>
-        <p class="error">${esc(state.error)}</p>
+        <p class="${state.error === t("saved") ? "ok" : "error"}">${esc(state.error)}</p>
         <div class="actions"><button class="primary" type="submit">${esc(t("savePrefs"))}</button></div>
       </form>
       <p class="lock-note">${esc(u.is_premium ? t("lockPremium") : t("lockFree"))}</p>
@@ -344,7 +526,7 @@ function profileView() {
       <p class="hero-kicker">${esc(t("recalibrate"))}</p>
       <p>${esc(t("recalibrateBody"))}</p>
       <div class="actions">
-        <button class="hebrew" id="redraw">${esc(t("redraw"))}</button>
+        <button class="accent" id="redraw">${esc(t("redraw"))}</button>
         <button class="ghost" data-go="chamber">${esc(t("enterChamber"))}</button>
       </div>
       ${adSlot()}
@@ -361,14 +543,20 @@ function render() {
     chamber: chamber,
     reading: readingView,
     chat: chatView,
+    discover: discoverView,
     profile: profileView,
   };
+  const draft = document.querySelector("#send-form input[name='content']")?.value;
   $app.innerHTML = (map[state.view] || landing)();
   bind();
-  if (state.view === "chat") connectWs();
+  if (state.view === "chat" && state.match) connectWs();
   else closeWs();
   const msgs = document.getElementById("msgs");
   if (msgs) msgs.scrollTop = msgs.scrollHeight;
+  if (draft) {
+    const input = document.querySelector("#send-form input[name='content']");
+    if (input) input.value = draft;
+  }
 }
 
 function bind() {
@@ -378,12 +566,20 @@ function bind() {
   $app.querySelectorAll("[data-lang]").forEach((el) => {
     el.addEventListener("click", () => setLang(el.getAttribute("data-lang")));
   });
+  $app.querySelectorAll("[data-open-chat]").forEach((el) => {
+    el.addEventListener("click", () => openExistingChat(el.getAttribute("data-open-chat")));
+  });
+  $app.querySelectorAll("[data-message]").forEach((el) => {
+    el.addEventListener("click", () => openWithPerson(el.getAttribute("data-message")));
+  });
   const logout = document.getElementById("logout");
   if (logout) logout.addEventListener("click", async () => {
     await api("/api/auth/logout", { method: "POST", body: "{}" });
     closeWs();
     state.user = null;
     state.match = null;
+    state.conversations = [];
+    state.messages = [];
     navigate("landing");
   });
   const minAge = document.getElementById("minAge");
@@ -408,13 +604,20 @@ function bind() {
     el.addEventListener("click", () => pickCard(Number(el.getAttribute("data-card"))));
   });
   const redraw = document.getElementById("redraw");
-  if (redraw) redraw.addEventListener("click", () => {
-    state.selected = [];
-    state.revealed = false;
-    navigate("chamber");
-  });
+  if (redraw) redraw.addEventListener("click", () => openChamber());
   const send = document.getElementById("send-form");
   if (send) send.addEventListener("submit", onSend);
+  const chatPhoto = document.getElementById("chat-photo");
+  if (chatPhoto) chatPhoto.addEventListener("change", onChatPhoto);
+  const profilePhoto = document.getElementById("profile-photo");
+  if (profilePhoto) profilePhoto.addEventListener("change", onProfilePhoto);
+  const unmatchBtn = document.getElementById("unmatch");
+  if (unmatchBtn) unmatchBtn.addEventListener("click", onUnmatch);
+  const back = document.getElementById("back-chats");
+  if (back) back.addEventListener("click", () => {
+    state.mobileThread = false;
+    render();
+  });
 }
 
 async function onAuth(e) {
@@ -437,18 +640,16 @@ async function onAuth(e) {
       };
       const data = await api("/api/auth/register", { method: "POST", body: JSON.stringify(body) });
       state.user = data.user;
+      await hydrateMe();
       state.selected = [];
       navigate("chamber");
     } else {
       const data = await api("/api/auth/login", { method: "POST", body: JSON.stringify({ email: fd.get("email"), password: fd.get("password") }) });
       state.user = data.user;
-      const me = await api("/api/me");
-      state.match = me.active_match;
+      const me = await hydrateMe();
       if (!state.user.energy_signature) navigate("chamber");
-      else if (state.match) {
-        await loadChat(state.match.id);
-        navigate("chat");
-      } else navigate("profile");
+      else if ((me.conversations || []).length) navigate("chat");
+      else navigate("discover");
     }
   } catch (err) {
     state.error = err.message;
@@ -474,7 +675,7 @@ async function onPrefs(e) {
       }),
     });
     state.user = data.user;
-    state.error = "";
+    state.error = t("saved");
     render();
   } catch (err) {
     state.error = err.message;
@@ -491,6 +692,7 @@ function pickCard(id) {
 }
 
 function onShuffle() {
+  shuffleDeck();
   state.shuffling = true;
   state.selected = [];
   state.revealed = false;
@@ -508,11 +710,12 @@ async function onDraw() {
   try {
     const data = await api("/api/tarot/draw", {
       method: "POST",
-      body: JSON.stringify({ card_ids: state.selected, unmatch_previous: true }),
+      body: JSON.stringify({ card_ids: state.selected, unmatch_previous: false }),
     });
     state.user = data.user;
     state.reading = data.reading;
     state.match = data.match;
+    state.conversations = data.conversations || state.conversations;
     state.revealed = true;
     render();
     setTimeout(() => navigate("reading"), 700);
@@ -528,6 +731,59 @@ async function loadChat(matchId) {
   state.messages = data.messages;
 }
 
+async function refreshInbox() {
+  try {
+    const data = await api("/api/conversations");
+    state.conversations = data.conversations || [];
+    state.unreadTotal = data.unread_total || 0;
+    if (state.match) {
+      const still = state.conversations.find((c) => c.id === state.match.id);
+      if (still) state.match = { ...state.match, ...still, partner: still.partner };
+    }
+  } catch {
+    /* ignore poll errors */
+  }
+}
+
+async function openExistingChat(matchId) {
+  try {
+    await loadChat(matchId);
+    state.mobileThread = true;
+    state.view = "chat";
+    await refreshInbox();
+    render();
+  } catch (err) {
+    state.error = err.message;
+    render();
+  }
+}
+
+async function openWithPerson(userId) {
+  try {
+    const data = await api("/api/match/open", { method: "POST", body: JSON.stringify({ user_id: userId }) });
+    state.match = data.match;
+    await loadChat(data.match.id);
+    state.mobileThread = true;
+    navigate("chat");
+  } catch (err) {
+    state.error = err.message;
+    render();
+  }
+}
+
+async function loadDiscover() {
+  try {
+    const data = await api("/api/discover");
+    state.discover = data.people || [];
+    state.error = "";
+    if (state.view === "discover") render();
+  } catch (err) {
+    state.error = err.message;
+    state.discover = [];
+    if (state.view === "discover") render();
+  }
+}
+
 async function onSend(e) {
   e.preventDefault();
   const input = e.target.content;
@@ -538,8 +794,79 @@ async function onSend(e) {
     method: "POST",
     body: JSON.stringify({ match_id: state.match.id, content }),
   });
-  if (!state.messages.find((m) => m.id === data.message.id)) {
-    state.messages.push(data.message);
+  pushMessage(data.message);
+  if (data.bot_message) pushMessage(data.bot_message);
+  await refreshInbox();
+  render();
+}
+
+function pushMessage(msg) {
+  if (!msg) return;
+  if (!state.messages.find((m) => m.id === msg.id)) state.messages.push(msg);
+}
+
+async function onChatPhoto(e) {
+  const file = e.target.files && e.target.files[0];
+  e.target.value = "";
+  if (!file || !state.match) return;
+  if (file.size > 5 * 1024 * 1024) {
+    state.error = t("photoTooBig");
+    render();
+    return;
+  }
+  const fd = new FormData();
+  fd.append("match_id", state.match.id);
+  fd.append("image", file);
+  const caption = document.querySelector("#send-form input[name='content']")?.value?.trim() || "";
+  if (caption) fd.append("content", caption);
+  try {
+    const data = await api("/api/chat/image", { method: "POST", body: fd });
+    const box = document.querySelector("#send-form input[name='content']");
+    if (box) box.value = "";
+    pushMessage(data.message);
+    if (data.bot_message) pushMessage(data.bot_message);
+    await refreshInbox();
+    render();
+  } catch (err) {
+    state.error = err.message;
+    render();
+  }
+}
+
+async function onProfilePhoto(e) {
+  const file = e.target.files && e.target.files[0];
+  e.target.value = "";
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) {
+    state.error = t("photoTooBig");
+    render();
+    return;
+  }
+  const fd = new FormData();
+  fd.append("photo", file);
+  try {
+    const data = await api("/api/users/photo", { method: "POST", body: fd });
+    state.user = data.user;
+    state.error = t("saved");
+    render();
+  } catch (err) {
+    state.error = err.message;
+    render();
+  }
+}
+
+async function onUnmatch() {
+  if (!state.match) return;
+  if (!window.confirm(t("unmatchConfirm"))) return;
+  try {
+    await api("/api/match/unmatch", { method: "POST", body: JSON.stringify({ match_id: state.match.id }) });
+    state.match = null;
+    state.messages = [];
+    state.mobileThread = false;
+    await refreshInbox();
+    render();
+  } catch (err) {
+    state.error = err.message;
     render();
   }
 }
@@ -561,12 +888,39 @@ function connectWs() {
   ws.onmessage = (ev) => {
     const payload = JSON.parse(ev.data);
     if (payload.type === "message" && payload.message) {
-      if (!state.messages.find((m) => m.id === payload.message.id)) {
-        state.messages.push(payload.message);
-        render();
-      }
+      pushMessage(payload.message);
+      render();
     }
   };
+}
+
+function startPolling() {
+  if (state.pollId) return;
+  state.pollId = setInterval(async () => {
+    if (!state.user) return;
+    const snap = JSON.stringify({
+      conv: state.conversations.map((c) => [c.id, c.unread, c.last_preview, c.last_message?.id]),
+      msgs: state.messages.map((m) => m.id),
+    });
+    try {
+      await refreshInbox();
+      if (state.view === "chat" && state.match) {
+        const threadVisible = state.mobileThread || window.matchMedia("(min-width: 900px)").matches;
+        if (threadVisible) {
+          const data = await api(`/api/chat/${state.match.id}`);
+          state.match = data.match;
+          state.messages = data.messages;
+        }
+      }
+    } catch {
+      return;
+    }
+    const next = JSON.stringify({
+      conv: state.conversations.map((c) => [c.id, c.unread, c.last_preview, c.last_message?.id]),
+      msgs: state.messages.map((m) => m.id),
+    });
+    if (next !== snap && (state.view === "chat" || state.unreadTotal >= 0)) render();
+  }, 3500);
 }
 
 boot().then(() => {

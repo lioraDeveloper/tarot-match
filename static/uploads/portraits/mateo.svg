@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Mateo">
+  <defs>
+    <linearGradient id="bg-mateo" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4a2d1d"/>
+      <stop offset="100%" stop-color="#1c1008"/>
+    </linearGradient>
+    <clipPath id="circ-mateo"><circle cx="128" cy="128" r="128"/></clipPath>
+  </defs>
+  <g clip-path="url(#circ-mateo)">
+    <rect width="256" height="256" fill="url(#bg-mateo)"/>
+    <circle cx="128" cy="90" r="90" fill="#ffffff" opacity="0.06"/>
+    <ellipse cx="128" cy="88" rx="71" ry="62" fill="#3b2214"/><rect x="72" y="110" width="12" height="70" rx="6" fill="#3b2214"/><rect x="86" y="110" width="12" height="84" rx="6" fill="#331d11"/><rect x="102" y="110" width="12" height="98" rx="6" fill="#3b2214"/><rect x="142" y="110" width="12" height="70" rx="6" fill="#331d11"/><rect x="158" y="110" width="12" height="84" rx="6" fill="#3b2214"/><rect x="172" y="110" width="12" height="98" rx="6" fill="#331d11"/>
+    <path d="M108 168 L148 168 L158 214 L98 214 Z" fill="#9c6b45"/><path d="M38 240 L72 188 Q128 204 184 188 L218 240 Z" fill="#c4b8a0"/><path d="M108 172 Q128 186 148 172 Q146 198 128 202 Q110 198 108 172 Z" fill="#9c6b45"/>
+    <ellipse cx="70" cy="128" rx="10" ry="16" fill="#9c6b45"/>
+    <ellipse cx="186" cy="128" rx="10" ry="16" fill="#9c6b45"/>
+    <ellipse cx="128" cy="112" rx="55" ry="70" fill="#9c6b45"/>
+    
+    <path d="M88 100 Q102 93 114 101" fill="none" stroke="#2e1a0f" stroke-width="3.2" stroke-linecap="round"/><path d="M142 101 Q154 93 168 100" fill="none" stroke="#2e1a0f" stroke-width="3.2" stroke-linecap="round"/>
+    <ellipse cx="102" cy="115" rx="12" ry="8" fill="#f7f1ea"/><circle cx="102" cy="115" r="6" fill="#3a4a2a"/><circle cx="102" cy="115" r="3" fill="#120c08"/><circle cx="104" cy="113" r="2" fill="#fff" opacity="0.85"/><path d="M90 114 Q102 105 114 114" fill="none" stroke="#65452c" stroke-width="1.4"/><ellipse cx="154" cy="115" rx="12" ry="8" fill="#f7f1ea"/><circle cx="154" cy="115" r="6" fill="#3a4a2a"/><circle cx="154" cy="115" r="3" fill="#120c08"/><circle cx="156" cy="113" r="2" fill="#fff" opacity="0.85"/><path d="M142 114 Q154 105 166 114" fill="none" stroke="#65452c" stroke-width="1.4"/>
+    <path d="M128 123 Q122 139 128 143 Q134 139 128 123" fill="#895e3c"/><ellipse cx="124" cy="143" rx="3" ry="2.2" fill="#7f5738" opacity="0.5"/><ellipse cx="132" cy="143" rx="3" ry="2.2" fill="#7f5738" opacity="0.5"/>
+    <path d="M114 155 Q128 163 142 155" fill="none" stroke="#795335" stroke-width="3" stroke-linecap="round"/>
+    <path d="M108 150 Q128 160 148 150 Q140 156 128 154 Q116 156 108 150 Z" fill="#382013"/>
+    
+    <circle cx="104" cy="114" r="16" fill="none" stroke="#1a1420" stroke-width="3" opacity="0.85"/><circle cx="152" cy="114" r="16" fill="none" stroke="#1a1420" stroke-width="3" opacity="0.85"/><path d="M120 114 H136" stroke="#1a1420" stroke-width="3"/><path d="M88 112 H78" stroke="#1a1420" stroke-width="3"/><path d="M168 112 H178" stroke="#1a1420" stroke-width="3"/><circle cx="104" cy="114" r="14" fill="#9ec9e8" opacity="0.12"/><circle cx="152" cy="114" r="14" fill="#9ec9e8" opacity="0.12"/>
+    
+  </g>
+</svg>

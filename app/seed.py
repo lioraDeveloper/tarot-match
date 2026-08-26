@@ -1,15 +1,20 @@
-"""Demo seekers so a fresh install can match immediately."""
+"""Demo seekers so Discover looks populated even on an existing database."""
 
 from __future__ import annotations
 
+import json
+
 from app import db
 from app.auth import hash_password
+from app.bot import ensure_bot_user
+from app.portraits import write_portrait
 from app.tarot import interpret_spread
+
+DEMO_PASSWORD = "demo1234"
 
 SEED_USERS = [
     {
         "email": "nova@demo.local",
-        "password": "demo1234",
         "name": "Nova",
         "birth_date": "1996-04-12",
         "gender": "woman",
@@ -21,7 +26,6 @@ SEED_USERS = [
     },
     {
         "email": "orion@demo.local",
-        "password": "demo1234",
         "name": "Orion",
         "birth_date": "1992-11-03",
         "gender": "man",
@@ -33,7 +37,6 @@ SEED_USERS = [
     },
     {
         "email": "lumen@demo.local",
-        "password": "demo1234",
         "name": "Lumen",
         "birth_date": "1998-07-21",
         "gender": "nonbinary",
@@ -45,7 +48,6 @@ SEED_USERS = [
     },
     {
         "email": "sol@demo.local",
-        "password": "demo1234",
         "name": "Sol",
         "birth_date": "1994-01-30",
         "gender": "man",
@@ -57,7 +59,6 @@ SEED_USERS = [
     },
     {
         "email": "iris@demo.local",
-        "password": "demo1234",
         "name": "Iris",
         "birth_date": "1997-09-08",
         "gender": "woman",
@@ -69,7 +70,6 @@ SEED_USERS = [
     },
     {
         "email": "kai@demo.local",
-        "password": "demo1234",
         "name": "Kai",
         "birth_date": "1991-05-16",
         "gender": "man",
@@ -81,7 +81,6 @@ SEED_USERS = [
     },
     {
         "email": "mira@demo.local",
-        "password": "demo1234",
         "name": "Mira",
         "birth_date": "1995-12-02",
         "gender": "woman",
@@ -93,7 +92,6 @@ SEED_USERS = [
     },
     {
         "email": "ash@demo.local",
-        "password": "demo1234",
         "name": "Ash",
         "birth_date": "1993-08-19",
         "gender": "nonbinary",
@@ -103,24 +101,493 @@ SEED_USERS = [
         "bio": "Poet with a day job in lighting design.",
         "cards": [15, 8, 20],
     },
+    {
+        "email": "noa@demo.local",
+        "name": "נועה",
+        "birth_date": "1994-03-14",
+        "gender": "woman",
+        "looking_for_gender": ["any"],
+        "min_age_preference": 24,
+        "max_age_preference": 42,
+        "bio": "I bake challah on Fridays and ruin it with too much honey.",
+        "cards": [0, 4, 16],
+    },
+    {
+        "email": "yonatan@demo.local",
+        "name": "יונתן",
+        "birth_date": "1993-02-08",
+        "gender": "man",
+        "looking_for_gender": ["any"],
+        "min_age_preference": 24,
+        "max_age_preference": 42,
+        "bio": "Builds furniture. Can't assemble IKEA without a fight.",
+        "cards": [1, 5, 10],
+    },
+    {
+        "email": "tali@demo.local",
+        "name": "טלי",
+        "birth_date": "1994-06-22",
+        "gender": "woman",
+        "looking_for_gender": ["any"],
+        "min_age_preference": 23,
+        "max_age_preference": 43,
+        "bio": "Graphic designer who still sketches on receipts.",
+        "cards": [3, 7, 19],
+    },
+    {
+        "email": "eitan@demo.local",
+        "name": "איתן",
+        "birth_date": "1996-08-27",
+        "gender": "man",
+        "looking_for_gender": ["any"],
+        "min_age_preference": 24,
+        "max_age_preference": 42,
+        "bio": "Cyclist. Will show you a hidden lookout and a decent espresso.",
+        "cards": [0, 8, 21],
+    },
+    {
+        "email": "maya@demo.local",
+        "name": "מאיה",
+        "birth_date": "1994-01-09",
+        "gender": "woman",
+        "looking_for_gender": ["any"],
+        "min_age_preference": 24,
+        "max_age_preference": 40,
+        "bio": "Weekend hikes, weekday playlists, always one book in my bag.",
+        "cards": [4, 11, 17],
+    },
+    {
+        "email": "roi@demo.local",
+        "name": "רועי",
+        "birth_date": "1990-01-19",
+        "gender": "man",
+        "looking_for_gender": ["any"],
+        "min_age_preference": 24,
+        "max_age_preference": 44,
+        "bio": "Radio producer. Asks good questions, burns toast.",
+        "cards": [5, 9, 18],
+    },
+    {
+        "email": "shira@demo.local",
+        "name": "שירה",
+        "birth_date": "1993-10-17",
+        "gender": "woman",
+        "looking_for_gender": ["any"],
+        "min_age_preference": 24,
+        "max_age_preference": 42,
+        "bio": "Choir kid who grew into someone who sings in the kitchen.",
+        "cards": [1, 12, 16],
+    },
+    {
+        "email": "adam@demo.local",
+        "name": "אדם",
+        "birth_date": "1997-05-03",
+        "gender": "man",
+        "looking_for_gender": ["any"],
+        "min_age_preference": 24,
+        "max_age_preference": 42,
+        "bio": "Software, but I swear I'm fun at dinner.",
+        "cards": [6, 10, 20],
+    },
+    {
+        "email": "yael@demo.local",
+        "name": "יעל",
+        "birth_date": "1992-04-28",
+        "gender": "woman",
+        "looking_for_gender": ["any"],
+        "min_age_preference": 24,
+        "max_age_preference": 44,
+        "bio": "Runs a tiny plant shop. Talks to the ferns, not sorry.",
+        "cards": [0, 3, 13],
+    },
+    {
+        "email": "daniel@demo.local",
+        "name": "דניאל",
+        "birth_date": "1994-10-12",
+        "gender": "man",
+        "looking_for_gender": ["any"],
+        "min_age_preference": 24,
+        "max_age_preference": 42,
+        "bio": "Climbs on weekends. Reads poetry like it's a map.",
+        "cards": [4, 14, 21],
+    },
+    {
+        "email": "sage@demo.local",
+        "name": "Sage",
+        "birth_date": "1992-03-21",
+        "gender": "man",
+        "looking_for_gender": ["any"],
+        "min_age_preference": 24,
+        "max_age_preference": 44,
+        "bio": "Bartender who remembers your order and your dog's name.",
+        "cards": [2, 8, 19],
+    },
+    {
+        "email": "rowan@demo.local",
+        "name": "Rowan",
+        "birth_date": "1997-08-16",
+        "gender": "nonbinary",
+        "looking_for_gender": ["any"],
+        "min_age_preference": 24,
+        "max_age_preference": 42,
+        "bio": "Makes zines, rides a beat-up bike, believes in long breakfasts.",
+        "cards": [5, 11, 16],
+    },
+    {
+        "email": "tess@demo.local",
+        "name": "Tess",
+        "birth_date": "1993-02-11",
+        "gender": "woman",
+        "looking_for_gender": ["any"],
+        "min_age_preference": 24,
+        "max_age_preference": 42,
+        "bio": "I will argue about movies and then cook you pasta.",
+        "cards": [1, 7, 17],
+    },
+    {
+        "email": "leo@demo.local",
+        "name": "Leo",
+        "birth_date": "1999-06-14",
+        "gender": "man",
+        "looking_for_gender": ["any"],
+        "min_age_preference": 24,
+        "max_age_preference": 40,
+        "bio": "Photographer. Golden hour is a personality trait.",
+        "cards": [9, 13, 21],
+    },
+    {
+        "email": "priya@demo.local",
+        "name": "Priya",
+        "birth_date": "1995-08-04",
+        "gender": "woman",
+        "looking_for_gender": ["any"],
+        "min_age_preference": 24,
+        "max_age_preference": 42,
+        "bio": "Ceramicist. Hands always a little dusty. Heart not.",
+        "cards": [0, 10, 15],
+    },
+    {
+        "email": "mateo@demo.local",
+        "name": "Mateo",
+        "birth_date": "1995-04-02",
+        "gender": "man",
+        "looking_for_gender": ["any"],
+        "min_age_preference": 24,
+        "max_age_preference": 42,
+        "bio": "I make a mean shakshuka and a worse first impression. Stay for the second.",
+        "cards": [3, 8, 18],
+    },
+    {
+        "email": "wren@demo.local",
+        "name": "Wren",
+        "birth_date": "1994-11-23",
+        "gender": "nonbinary",
+        "looking_for_gender": ["any"],
+        "min_age_preference": 24,
+        "max_age_preference": 42,
+        "bio": "Sound designer. I notice the room before the people. Then the people.",
+        "cards": [4, 12, 20],
+    },
+    {
+        "email": "nadia@demo.local",
+        "name": "Nadia",
+        "birth_date": "1993-12-19",
+        "gender": "woman",
+        "looking_for_gender": ["any"],
+        "min_age_preference": 24,
+        "max_age_preference": 44,
+        "bio": "Night-shift nurse. Daytime sun, strong coffee, honest people.",
+        "cards": [2, 6, 16],
+    },
+    {
+        "email": "felix@demo.local",
+        "name": "Felix",
+        "birth_date": "1991-09-18",
+        "gender": "man",
+        "looking_for_gender": ["any"],
+        "min_age_preference": 24,
+        "max_age_preference": 44,
+        "bio": "Jazz piano, thrift stores, terrible puns.",
+        "cards": [5, 13, 19],
+    },
+    {
+        "email": "zara@demo.local",
+        "name": "Zara",
+        "birth_date": "1992-05-07",
+        "gender": "woman",
+        "looking_for_gender": ["any"],
+        "min_age_preference": 24,
+        "max_age_preference": 40,
+        "bio": "DJ on Saturdays, librarian energy the rest of the week.",
+        "cards": [1, 11, 21],
+    },
+    {
+        "email": "jonas@demo.local",
+        "name": "Jonas",
+        "birth_date": "1998-12-06",
+        "gender": "man",
+        "looking_for_gender": ["any"],
+        "min_age_preference": 24,
+        "max_age_preference": 42,
+        "bio": "Marine biologist inland. I miss the water and talk about it anyway.",
+        "cards": [7, 14, 18],
+    },
+    {
+        "email": "amira@demo.local",
+        "name": "אמירה",
+        "birth_date": "1994-11-25",
+        "gender": "woman",
+        "looking_for_gender": ["any"],
+        "min_age_preference": 24,
+        "max_age_preference": 42,
+        "bio": "Makes pickles, plans trips, texts back.",
+        "cards": [0, 9, 20],
+    },
+    {
+        "email": "nico@demo.local",
+        "name": "Nico",
+        "birth_date": "1996-01-11",
+        "gender": "man",
+        "looking_for_gender": ["any"],
+        "min_age_preference": 24,
+        "max_age_preference": 42,
+        "bio": "Tattoo apprentice. Quiet until the conversation gets real.",
+        "cards": [3, 10, 16],
+    },
+    {
+        "email": "leila@demo.local",
+        "name": "ליילה",
+        "birth_date": "1994-09-30",
+        "gender": "woman",
+        "looking_for_gender": ["any"],
+        "min_age_preference": 24,
+        "max_age_preference": 42,
+        "bio": "I collect city maps and get lost on purpose.",
+        "cards": [4, 8, 15],
+    },
+    {
+        "email": "omer@demo.local",
+        "name": "עומר",
+        "birth_date": "1993-07-29",
+        "gender": "man",
+        "looking_for_gender": ["any"],
+        "min_age_preference": 24,
+        "max_age_preference": 44,
+        "bio": "Farmer's market loyalist. Brings extra peaches.",
+        "cards": [2, 11, 19],
+    },
+    {
+        "email": "daphne@demo.local",
+        "name": "דפנה",
+        "birth_date": "1991-07-15",
+        "gender": "woman",
+        "looking_for_gender": ["any"],
+        "min_age_preference": 24,
+        "max_age_preference": 44,
+        "bio": "Editor. I notice the sentence you almost said.",
+        "cards": [6, 12, 21],
+    },
+    {
+        "email": "hila@demo.local",
+        "name": "הילה",
+        "birth_date": "1993-05-11",
+        "gender": "woman",
+        "looking_for_gender": ["any"],
+        "min_age_preference": 24,
+        "max_age_preference": 44,
+        "bio": "Yoga at dawn, leftovers at midnight. Looking for someone who laughs first.",
+        "cards": [0, 5, 14],
+    },
+    {
+        "email": "gal@demo.local",
+        "name": "גל",
+        "birth_date": "1995-02-20",
+        "gender": "woman",
+        "looking_for_gender": ["any"],
+        "min_age_preference": 24,
+        "max_age_preference": 42,
+        "bio": "Documentary editor. I'll notice the light in the room before I sit down.",
+        "cards": [1, 8, 13],
+    },
+    {
+        "email": "sivan@demo.local",
+        "name": "סיון",
+        "birth_date": "1994-03-18",
+        "gender": "woman",
+        "looking_for_gender": ["any"],
+        "min_age_preference": 24,
+        "max_age_preference": 42,
+        "bio": "I keep a notebook of first dates that went well. The food section is long.",
+        "cards": [2, 9, 16],
+    },
+    {
+        "email": "elena@demo.local",
+        "name": "Elena",
+        "birth_date": "1991-08-09",
+        "gender": "woman",
+        "looking_for_gender": ["any"],
+        "min_age_preference": 24,
+        "max_age_preference": 44,
+        "bio": "Violin on Tuesdays, sea on Fridays. I text when I say I will.",
+        "cards": [3, 11, 20],
+    },
+    {
+        "email": "ravi@demo.local",
+        "name": "Ravi",
+        "birth_date": "1992-11-21",
+        "gender": "man",
+        "looking_for_gender": ["any"],
+        "min_age_preference": 24,
+        "max_age_preference": 44,
+        "bio": "Cooks too hot, apologizes too late, stays for dessert.",
+        "cards": [7, 12, 19],
+    },
+    {
+        "email": "inbar@demo.local",
+        "name": "ענבר",
+        "birth_date": "1996-09-04",
+        "gender": "woman",
+        "looking_for_gender": ["any"],
+        "min_age_preference": 24,
+        "max_age_preference": 42,
+        "bio": "Architect of tiny apartments and large breakfasts.",
+        "cards": [5, 10, 17],
+    },
+    {
+        "email": "tom@demo.local",
+        "name": "תום",
+        "birth_date": "1994-06-01",
+        "gender": "man",
+        "looking_for_gender": ["any"],
+        "min_age_preference": 24,
+        "max_age_preference": 42,
+        "bio": "Trail runner. Will share water and a terrible joke.",
+        "cards": [0, 8, 18],
+    },
+    {
+        "email": "lina@demo.local",
+        "name": "Lina",
+        "birth_date": "1997-03-27",
+        "gender": "woman",
+        "looking_for_gender": ["any"],
+        "min_age_preference": 24,
+        "max_age_preference": 40,
+        "bio": "Makes playlists named after weather. Currently: warm front.",
+        "cards": [2, 14, 21],
+    },
+    {
+        "email": "ido@demo.local",
+        "name": "עידו",
+        "birth_date": "1990-12-14",
+        "gender": "man",
+        "looking_for_gender": ["any"],
+        "min_age_preference": 24,
+        "max_age_preference": 44,
+        "bio": "History teacher. Knows too many stories and one good pasta.",
+        "cards": [4, 9, 16],
+    },
+    {
+        "email": "noga@demo.local",
+        "name": "נגה",
+        "birth_date": "1995-07-08",
+        "gender": "woman",
+        "looking_for_gender": ["any"],
+        "min_age_preference": 24,
+        "max_age_preference": 42,
+        "bio": "I keep succulents alive. People, we'll see.",
+        "cards": [1, 6, 20],
+    },
+    {
+        "email": "samir@demo.local",
+        "name": "Samir",
+        "birth_date": "1993-01-26",
+        "gender": "man",
+        "looking_for_gender": ["any"],
+        "min_age_preference": 24,
+        "max_age_preference": 44,
+        "bio": "Saxophone on the roof when the neighbors forgive me.",
+        "cards": [3, 13, 19],
+    },
+    {
+        "email": "ruth@demo.local",
+        "name": "רות",
+        "birth_date": "1991-04-16",
+        "gender": "woman",
+        "looking_for_gender": ["any"],
+        "min_age_preference": 24,
+        "max_age_preference": 44,
+        "bio": "Bookstore mornings. I'll dog-ear your favorite page.",
+        "cards": [8, 11, 17],
+    },
 ]
+
+for _demo in SEED_USERS:
+    _demo["looking_for_gender"] = ["any"]
+    _demo["min_age_preference"] = 18
+    _demo["max_age_preference"] = 99
+
+
+
+def _upsert_seed_person(item: dict) -> str:
+    """Create the demo profile if missing; always refresh the portrait. Returns added|updated."""
+    photo = write_portrait(item["email"], item["name"], item["gender"])
+    existing = db.get_user_by_email(item["email"])
+    if existing:
+        user = db.user_from_row(existing)
+        with db.tx() as conn:
+            conn.execute(
+                """
+                UPDATE users SET name = ?, birth_date = ?, gender = ?, looking_for_gender = ?,
+                    min_age_preference = ?, max_age_preference = ?, bio = ?, photo_url = ?
+                WHERE id = ?
+                """,
+                (
+                    item["name"],
+                    item["birth_date"],
+                    item["gender"],
+                    json.dumps(item["looking_for_gender"]),
+                    item["min_age_preference"],
+                    item["max_age_preference"],
+                    item["bio"],
+                    photo,
+                    user["id"],
+                ),
+            )
+        if not user.get("energy_signature"):
+            reading = interpret_spread(item["cards"])
+            db.save_spread(user["id"], reading["energy_signature"], reading["last_spread"])
+        return "updated"
+    reading = interpret_spread(item["cards"])
+    db.create_user(
+        email=item["email"],
+        password_hash=hash_password(DEMO_PASSWORD),
+        name=item["name"],
+        birth_date=item["birth_date"],
+        gender=item["gender"],
+        looking_for_gender=item["looking_for_gender"],
+        min_age_preference=item["min_age_preference"],
+        max_age_preference=item["max_age_preference"],
+        bio=item["bio"],
+        energy_signature=reading["energy_signature"],
+        last_spread=reading["last_spread"],
+        photo_url=photo,
+    )
+    return "added"
+
+
+def seed_demo_users() -> dict[str, int]:
+    """Idempotent: fills Discover without wiping real accounts."""
+    ensure_bot_user()
+    added = 0
+    updated = 0
+    for item in SEED_USERS:
+        result = _upsert_seed_person(item)
+        if result == "added":
+            added += 1
+        else:
+            updated += 1
+    return {"added": added, "updated": updated, "total": len(SEED_USERS)}
 
 
 def seed_if_empty() -> None:
-    if db.user_count() > 0:
-        return
-    for item in SEED_USERS:
-        reading = interpret_spread(item["cards"])
-        db.create_user(
-            email=item["email"],
-            password_hash=hash_password(item["password"]),
-            name=item["name"],
-            birth_date=item["birth_date"],
-            gender=item["gender"],
-            looking_for_gender=item["looking_for_gender"],
-            min_age_preference=item["min_age_preference"],
-            max_age_preference=item["max_age_preference"],
-            bio=item["bio"],
-            energy_signature=reading["energy_signature"],
-            last_spread=reading["last_spread"],
-        )
+    seed_demo_users()

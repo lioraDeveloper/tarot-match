@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Oracle">
+  <defs>
+    <linearGradient id="oracleBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3a1d6e"/>
+      <stop offset="55%" stop-color="#140b28"/>
+      <stop offset="100%" stop-color="#07050f"/>
+    </linearGradient>
+    <radialGradient id="oracleGlow" cx="50%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="256" height="256" rx="128" fill="url(#oracleBg)"/>
+  <rect width="256" height="256" rx="128" fill="url(#oracleGlow)"/>
+  <circle cx="128" cy="128" r="78" fill="none" stroke="#e4c46a" stroke-opacity="0.55" stroke-width="2"/>
+  <path d="M154 86 A56 56 0 1 0 154 170 A42 42 0 1 1 154 86 Z" fill="#e4c46a"/>
+  <path d="M196 58 L202 74 L218 80 L202 86 L196 102 L190 86 L174 80 L190 74 Z" fill="#f0d78c"/>
+  <circle cx="188" cy="168" r="3.5" fill="#e4c46a"/>
+  <circle cx="72" cy="74" r="2.5" fill="#e4c46a" opacity="0.85"/>
+</svg>
