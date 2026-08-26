@@ -92,10 +92,14 @@ function localizeError(msg) {
 }
 
 function shuffleDeck() {
+  const prevFirst = state.deck[0] && state.deck[0].id;
   const deck = (state.deck || []).slice();
   for (let i = deck.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [deck[i], deck[j]] = [deck[j], deck[i]];
+  }
+  if (deck.length > 1 && prevFirst !== undefined && deck[0].id === prevFirst) {
+    deck.push(deck.shift());
   }
   state.deck = deck;
 }
@@ -105,8 +109,14 @@ function openChamber() {
   state.revealed = false;
   state.error = "";
   shuffleDeck();
+  state.shuffling = true;
   state.view = "chamber";
   render();
+  setTimeout(() => {
+    if (state.view !== "chamber") return;
+    state.shuffling = false;
+    render();
+  }, 700);
 }
 
 function navigate(view) {
@@ -317,7 +327,7 @@ function cardButton(c) {
   const sel = state.selected.includes(c.id);
   const dim = state.selected.length >= 3 && !sel;
   const revealed = state.revealed && sel;
-  return `<button type="button" class="arcana ${sel ? "selected" : ""} ${dim ? "dim" : ""} ${revealed ? "revealed" : ""}" data-card="${c.id}" aria-label="${esc(cardName(c.id))}">
+  return `<button type="button" class="arcana ${sel ? "selected" : ""} ${dim ? "dim" : ""} ${revealed ? "revealed" : ""}" data-card="${c.id}" style="--card-hue:${(c.id * 17) % 360}" aria-label="${esc(cardName(c.id))}">
     <div class="face back">
       <span class="back-roman">${ROMAN[c.id]}</span>
       <div class="back-art" aria-hidden="true">${CARD_SVG[c.id]}</div>

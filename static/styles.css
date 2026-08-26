@@ -198,16 +198,17 @@ button.hebrew {
   overflow: hidden;
 }
 .back {
-  background: var(--card-back);
+  background: linear-gradient(155deg, hsl(var(--card-hue, 270), 42%, 24%) 0%, #0d0818 70%);
   box-shadow: inset 0 0 0 4px rgba(228, 196, 106, 0.35);
   gap: 0.15rem;
 }
 .back-roman {
   color: var(--gold);
   font-family: var(--font);
-  font-size: 0.72rem;
-  letter-spacing: 0.14em;
+  font-size: 1.35rem;
+  letter-spacing: 0.08em;
   z-index: 1;
+  text-shadow: 0 0 10px rgba(228, 196, 106, 0.45);
 }
 .back-art {
   width: 72%;
