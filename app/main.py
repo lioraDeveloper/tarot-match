@@ -264,6 +264,25 @@ def index() -> FileResponse:
     )
 
 
+@app.get("/sw.js")
+def service_worker() -> FileResponse:
+    """Serve the service worker from the origin root so PWA scope covers the app."""
+    return FileResponse(
+        STATIC / "sw.js",
+        media_type="application/javascript",
+        headers={"Cache-Control": "no-cache", "Service-Worker-Allowed": "/"},
+    )
+
+
+@app.get("/manifest.webmanifest")
+def web_manifest() -> FileResponse:
+    return FileResponse(
+        STATIC / "manifest.webmanifest",
+        media_type="application/manifest+json",
+        headers={"Cache-Control": "no-cache"},
+    )
+
+
 @app.get("/api/tarot/deck")
 def deck(request: Request, x_lang: str | None = Header(default=None, alias="X-Lang")) -> dict[str, Any]:
     lang = lang_of(request, x_lang)

@@ -15,7 +15,8 @@
 
 * { box-sizing: border-box; }
 html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--text); font-family: var(--ui); }
-body { overflow-x: hidden; }
+body { overflow-x: hidden; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); }
+body.app-shell { overscroll-behavior-y: none; }
 
 .veil {
   pointer-events: none;
@@ -28,14 +29,21 @@ body { overflow-x: hidden; }
   z-index: 0;
 }
 
-#app { position: relative; z-index: 1; min-height: 100vh; }
+#app { position: relative; z-index: 1; min-height: 100vh; min-height: 100dvh; }
+#app.has-tabbar { padding-bottom: calc(4.6rem + env(safe-area-inset-bottom)); }
 
 .nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 1.5rem;
+  padding: 0.85rem 1.25rem;
+  padding-top: max(0.85rem, env(safe-area-inset-top));
   border-bottom: 1px solid rgba(228, 196, 106, 0.18);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  backdrop-filter: blur(12px);
+  background: rgba(7, 6, 15, 0.88);
 }
 .brand {
   font-family: var(--font);
@@ -477,3 +485,99 @@ button.accent {
 
 .actions { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-top: 1.2rem; }
 .reading p { line-height: 1.6; color: #ddd2f0; }
+
+.trial-banner {
+  margin: 0.9rem auto 0;
+  max-width: 520px;
+  padding: 0.65rem 0.9rem;
+  border-radius: 12px;
+  border: 1px solid rgba(228, 196, 106, 0.35);
+  background: rgba(228, 196, 106, 0.08);
+  color: var(--gold);
+  font-size: 0.86rem;
+  line-height: 1.4;
+}
+
+.install-bar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  justify-content: space-between;
+  padding: 0.65rem 1rem;
+  padding-top: max(0.65rem, env(safe-area-inset-top));
+  background: linear-gradient(180deg, rgba(28, 18, 54, 0.98), rgba(7, 6, 15, 0.96));
+  border-bottom: 1px solid rgba(228, 196, 106, 0.28);
+  color: var(--text);
+  font-size: 0.88rem;
+}
+.install-bar .install-copy { flex: 1; min-width: 0; }
+.install-bar .install-copy strong { color: var(--gold); font-weight: 600; }
+.install-bar .actions { margin: 0; flex-wrap: nowrap; }
+.install-bar button.ghost.small,
+.install-bar button.primary.small {
+  padding: 0.4rem 0.85rem;
+  font-size: 0.8rem;
+}
+
+.tabbar {
+  display: none;
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 40;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.15rem;
+  padding: 0.35rem 0.4rem calc(0.35rem + env(safe-area-inset-bottom));
+  background: rgba(7, 6, 15, 0.94);
+  border-top: 1px solid rgba(228, 196, 106, 0.22);
+  backdrop-filter: blur(14px);
+}
+.tabbar button {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.68rem;
+  letter-spacing: 0.02em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.35rem 0.2rem;
+  cursor: pointer;
+  border-radius: 12px;
+  position: relative;
+}
+.tabbar button .tab-ico {
+  font-family: var(--font);
+  font-size: 1.05rem;
+  line-height: 1;
+  color: inherit;
+}
+.tabbar button.on {
+  color: var(--gold);
+  background: rgba(228, 196, 106, 0.1);
+}
+.tabbar .badge {
+  position: absolute;
+  top: 0.15rem;
+  inset-inline-end: calc(50% - 1.35rem);
+  margin: 0;
+}
+
+@media (max-width: 899px) {
+  .nav-end .link[data-go],
+  .nav-end #logout { display: none; }
+  #app.has-tabbar .tabbar { display: grid; }
+  .shell { padding-bottom: 1.5rem; }
+  .thread { height: min(62vh, 560px); height: min(62dvh, 560px); }
+}
+
+@media (display-mode: standalone), (display-mode: fullscreen) {
+  .install-bar { display: none !important; }
+  body.app-shell .nav { border-bottom-color: rgba(228, 196, 106, 0.12); }
+}

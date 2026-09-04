@@ -25,6 +25,8 @@ const state = {
   lang: detectLang(),
   pollId: null,
   mobileThread: false,
+  deferredInstall: null,
+  showInstall: false,
 };
 
 const $app = document.getElementById("app");
@@ -258,10 +260,44 @@ function navBar() {
        <button class="link" data-go="chat">${esc(t("navChat"))}${unread}</button>
        <button class="link" id="logout">${esc(t("navLeave"))}</button>`
     : "";
-  return `<header class="nav">
+  return `${installBar()}<header class="nav">
     <div class="brand">${esc(t("brand"))}</div>
     <div class="nav-end">${links}${langSwitch()}</div>
   </header>`;
+}
+
+function installBar() {
+  if (!state.showInstall) return "";
+  const canPrompt = !!state.deferredInstall;
+  const cta = canPrompt
+    ? `<button type="button" class="primary small" id="install-app">${esc(t("installCta"))}</button>`
+    : `<span class="muted" style="font-size:0.78rem">${esc(t("installHowIos"))}</span>`;
+  return `<div class="install-bar" role="region" aria-label="${esc(t("installTitle"))}">
+    <div class="install-copy"><strong>${esc(t("installTitle"))}</strong> — ${esc(t("installBody"))}</div>
+    <div class="actions">${cta}
+      <button type="button" class="ghost small" id="install-dismiss">${esc(t("installLater"))}</button>
+    </div>
+  </div>`;
+}
+
+function tabBar() {
+  if (!state.user) return "";
+  const unread = unreadBadge(state.unreadTotal);
+  const items = [
+    ["chamber", "✧", "navChamber"],
+    ["discover", "◎", "navDiscover"],
+    ["chat", "✎", "navChat"],
+    ["profile", "◉", "navProfile"],
+  ];
+  const tabs = items.map(([view, ico, label]) => {
+    const on = state.view === view || (view === "chamber" && state.view === "reading");
+    const badge = view === "chat" ? unread : "";
+    return `<button type="button" class="${on ? "on" : ""}" data-go="${view}" aria-current="${on ? "page" : "false"}">
+      <span class="tab-ico" aria-hidden="true">${ico}</span>
+      <span>${esc(t(label))}${badge}</span>
+    </button>`;
+  }).join("");
+  return `<nav class="tabbar" aria-label="Aether">${tabs}</nav>`;
 }
 
 function adSlot() {
@@ -273,11 +309,12 @@ function landing() {
     <p class="hero-kicker">${esc(t("landingKicker"))}</p>
     <h1>${t("landingTitle")}</h1>
     <p class="muted">${esc(t("landingBody"))}</p>
+    <p class="trial-banner">${esc(t("trialBadge"))}</p>
     <div class="actions" style="justify-content:center">
       <button class="primary" data-go="register">${esc(t("beginRitual"))}</button>
       <button class="ghost" data-go="login">${esc(t("haveKey"))}</button>
     </div>
-  </div>`;
+  </div>${tabBar()}`;
 }
 
 function authForm(mode) {
@@ -544,6 +581,7 @@ function profileView() {
 
 function render() {
   applyDir();
+  document.body.classList.add("app-shell");
   const map = {
     landing: landing,
     login: () => authForm("login"),
@@ -555,7 +593,10 @@ function render() {
     profile: profileView,
   };
   const draft = document.querySelector("#send-form input[name='content']")?.value;
-  $app.innerHTML = (map[state.view] || landing)();
+  const body = (map[state.view] || landing)();
+  const withTabs = state.user && !body.includes('class="tabbar"') ? `${body}${tabBar()}` : body;
+  $app.innerHTML = withTabs;
+  $app.classList.toggle("has-tabbar", !!state.user);
   bind();
   if (state.view === "chat" && state.match) connectWs();
   else closeWs();
@@ -624,6 +665,14 @@ function bind() {
   const back = document.getElementById("back-chats");
   if (back) back.addEventListener("click", () => {
     state.mobileThread = false;
+    render();
+  });
+  const installBtn = document.getElementById("install-app");
+  if (installBtn) installBtn.addEventListener("click", onInstallApp);
+  const installDismiss = document.getElementById("install-dismiss");
+  if (installDismiss) installDismiss.addEventListener("click", () => {
+    state.showInstall = false;
+    localStorage.setItem("aether_install_dismissed", "1");
     render();
   });
 }
@@ -934,3 +983,54 @@ function startPolling() {
 boot().then(() => {
   if (state.view === "chat" && state.match) loadChat(state.match.id).then(render);
 });
+
+function isStandalone() {
+  return window.matchMedia("(display-mode: standalone)").matches
+    || window.navigator.standalone === true;
+}
+
+function refreshInstallVisibility() {
+  if (isStandalone()) {
+    state.showInstall = false;
+    return;
+  }
+  if (localStorage.getItem("aether_install_dismissed") === "1") {
+    state.showInstall = false;
+    return;
+  }
+  // Show bar when browser can install, or on iOS/mobile where Add to Home Screen is available.
+  const mobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  state.showInstall = !!(state.deferredInstall || mobile);
+}
+
+async function onInstallApp() {
+  if (!state.deferredInstall) return;
+  const prompt = state.deferredInstall;
+  state.deferredInstall = null;
+  await prompt.prompt();
+  try { await prompt.userChoice; } catch { /* ignore */ }
+  state.showInstall = false;
+  render();
+}
+
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  state.deferredInstall = e;
+  refreshInstallVisibility();
+  if (state.showInstall) render();
+});
+
+window.addEventListener("appinstalled", () => {
+  state.deferredInstall = null;
+  state.showInstall = false;
+  localStorage.setItem("aether_install_dismissed", "1");
+  render();
+});
+
+refreshInstallVisibility();
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js").catch(() => {});
+  });
+}
