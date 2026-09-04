@@ -521,6 +521,7 @@ SEED_USERS = [
     },
 ]
 
+# Demo seekers accept a typical new user (any gender, adult ages) so Discover stays full.
 for _demo in SEED_USERS:
     _demo["looking_for_gender"] = ["any"]
     _demo["min_age_preference"] = 18
