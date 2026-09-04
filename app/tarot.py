@@ -32,34 +32,70 @@ MAJOR_ARCANA: list[dict[str, Any]] = [
         "unbalanced": "Fear of commitment, escape from structure, hard to stay steady when it gets real.",
         "green_path": {
             "title": "Want to know more about yourselves?",
-            "intro": "The Fool opened a living beginning. Now check together what strengthens the bond — and what may pull you apart.",
-            "focus_question": "What do you want to work on first?",
-            "focus_options": [
-                "Freedom without running",
-                "Staying when it gets real",
-                "Building shared plans",
-                "Keeping healthy lightness",
-            ],
-            "questions": [
+            "intro": (
+                "We turned the Fool's relationship energy into a clear path: "
+                "question → answer → where you are now → what to do."
+            ),
+            "items": [
                 {
-                    "id": "free",
-                    "prompt": "Where in this connection do you feel most free together?",
-                    "hint": "Each write one sentence, then share.",
+                    "id": "start",
+                    "question": "Is this a real beginning between you — or only a momentary thrill?",
+                    "answer": (
+                        "The Fool speaks of an open start: air, laughter, the feeling that something "
+                        "new can begin before every answer is ready."
+                    ),
+                    "now": "You are in a spark-and-beginning stage. The bond feels light and open.",
+                    "do": "Let the excitement breathe — and ask together if both of you want to build from it.",
                 },
                 {
-                    "id": "choose",
-                    "prompt": "When it's time to choose and stay — what happens for you?",
-                    "options": [
-                        "We stay and talk",
-                        "One stays and one pulls away",
-                        "We both get scared and go too light",
-                        "We haven't really tested this yet",
-                    ],
+                    "id": "freedom",
+                    "question": "Does freedom bring you closer — or farther apart?",
+                    "answer": (
+                        "In the Fool, freedom is strength when it lives inside the bond. "
+                        "It becomes weakness when it turns into escape from structure and tomorrow."
+                    ),
+                    "now": "Check whether the space between you feels safe — or like avoidance.",
+                    "do": "Set one simple shared boundary: what is free for you, and what already counts as running.",
                 },
                 {
-                    "id": "next",
-                    "prompt": "What small step will you take this week to build a path — not only a beginning?",
-                    "hint": "Something simple: a plan, a talk, or a small promise you both keep.",
+                    "id": "commitment",
+                    "question": "When it's time to choose and stay — what happens?",
+                    "answer": (
+                        "When the Fool is balanced, there is courage to stay even without full certainty. "
+                        "When unbalanced, commitment feels like a cage and avoidance appears."
+                    ),
+                    "now": "You are in the test between 'let's flow' and 'we choose to stay'.",
+                    "do": "Make one small clear choice for the coming week — a plan, a talk, or a promise you both keep.",
+                },
+                {
+                    "id": "approval",
+                    "question": "Are you following what feels true to you — or what looks good from outside?",
+                    "answer": (
+                        "The Fool calls you to follow an inner sense, even if others find it odd. "
+                        "In love, that means choosing the bond from truth, not pressure."
+                    ),
+                    "now": "Notice whether your choices come from the heart — or from fear of what people will say.",
+                    "do": "Each say one sentence: why I truly choose you.",
+                },
+                {
+                    "id": "balance",
+                    "question": "How do you keep lightness without losing reliability?",
+                    "answer": (
+                        "The beautiful side of the Fool is aliveness and spontaneity. "
+                        "The weak side is difficulty being someone who can be counted on over time."
+                    ),
+                    "now": "If there is chemistry but little stability — that is exactly this card's tension.",
+                    "do": "Keep the play, and add one steady anchor: a fixed time, a clear message, or a small plan.",
+                },
+                {
+                    "id": "path",
+                    "question": "Are you building a shared path — or only enjoying the beginning?",
+                    "answer": (
+                        "With the Fool, chemistry alone is not enough. "
+                        "The potential becomes real when there is freedom and also the choice to stay."
+                    ),
+                    "now": "This is the moment to understand where this connection is going for you.",
+                    "do": "Answer together in one sentence: 'We want to build ___ together.' Then take one small step toward it.",
                 },
             ],
         },
@@ -309,34 +345,70 @@ HE_CARDS = {
         "unbalanced": "פחד ממחויבות, בריחה ממסגרת, קושי להיות יציב כשזה נהיה רציני.",
         "green_path": {
             "title": "רוצים להכיר אתכם יותר?",
-            "intro": "השוטה פתח לכם התחלה חיה. עכשיו נבדוק יחד מה מחזק את הקשר ומה עלול להרחיק.",
-            "focus_question": "על מה אתם רוצים לעבוד קודם?",
-            "focus_options": [
-                "חופש בלי לברוח",
-                "להישאר גם כשזה נהיה רציני",
-                "לבנות תוכניות משותפות",
-                "לשמור על קלילות בריאה",
-            ],
-            "questions": [
+            "intro": (
+                "לקחנו את האנרגיה של השוטה בזוגיות והפכנו אותה למסלול ברור: "
+                "שאלה → תשובה → איפה אתם עכשיו → מה לעשות."
+            ),
+            "items": [
                 {
-                    "id": "free",
-                    "prompt": "איפה בקשר הזה אתם מרגישים הכי חופשיים יחד?",
-                    "hint": "רשמו משפט אחד כל אחד, ואז שתפו.",
+                    "id": "start",
+                    "question": "האם יש ביניכם התחלה אמיתית — או רק ריגוש רגעי?",
+                    "answer": (
+                        "השוטה מדבר על התחלה פתוחה: אוויר, צחוק, תחושה שאפשר להתחיל משהו חדש "
+                        "בלי שכל התשובות יהיו מוכנות."
+                    ),
+                    "now": "אתם בשלב של ניצוץ והתחלה. הקשר מרגיש קל ופתוח.",
+                    "do": "תנו לריגוש מקום — וגם שאלו יחד אם שניכם רוצים לבנות ממנו משהו.",
                 },
                 {
-                    "id": "choose",
-                    "prompt": "כשצריך לבחור ולהישאר — מה קורה אצלכם?",
-                    "options": [
-                        "אנחנו נשארים ומדברים",
-                        "אחד נשאר ואחד מתרחק",
-                        "שנינו נבהלים ונהיים קלים מדי",
-                        "עוד לא בדקנו את זה באמת",
-                    ],
+                    "id": "freedom",
+                    "question": "החופש אצלכם מחבר — או מרחיק?",
+                    "answer": (
+                        "בשוטה, חופש הוא כוח כשהוא חי בתוך הקשר. "
+                        "הוא הופך לחולשה כשהוא נהיה בריחה ממסגרת וממחר."
+                    ),
+                    "now": "בדקו אם המרחב ביניכם מרגיש בטוח — או כמו התחמקות.",
+                    "do": "הגדירו יחד גבול אחד פשוט: מה חופשי אצלכם, ומה כבר נחשב בריחה.",
                 },
                 {
-                    "id": "next",
-                    "prompt": "איזה צעד קטן תעשו השבוע כדי לבנות דרך — לא רק להתחיל?",
-                    "hint": "משהו פשוט: תוכנית, שיחה, או הבטחה קטנה ששניכם עומדים בה.",
+                    "id": "commitment",
+                    "question": "כשצריך לבחור ולהישאר — מה קורה?",
+                    "answer": (
+                        "כשהשוטה מאוזן, יש אומץ להישאר גם בלי ודאות מלאה. "
+                        "כשהוא לא מאוזן, מחויבות מרגישה כמו כלוב ומופיעה התחמקות."
+                    ),
+                    "now": "אתם במבחן בין «נזרום» לבין «בוחרים להישאר».",
+                    "do": "עשו בחירה קטנה וברורה לשבוע הקרוב — תוכנית, שיחה, או הבטחה ששניכם עומדים בה.",
+                },
+                {
+                    "id": "approval",
+                    "question": "אתם הולכים לפי מה שנכון לכם — או לפי מה שייראה טוב מבחוץ?",
+                    "answer": (
+                        "השוטה קורא ללכת אחרי תחושת פנים, גם אם זה נראה לאחרים לא הגיוני. "
+                        "בזוגיות זה אומר לבחור את הקשר מתוך אמת, לא מתוך לחץ."
+                    ),
+                    "now": "שימו לב אם הבחירות שלכם מגיעות מלב — או מפחד ממה יגידו.",
+                    "do": "כל אחד יגיד משפט אחד: למה אני בוחר/ת בך באמת.",
+                },
+                {
+                    "id": "balance",
+                    "question": "איך שומרים קלילות בלי לאבד אמינות?",
+                    "answer": (
+                        "הצד היפה של השוטה הוא חיות וספונטניות. "
+                        "הצד החלש הוא קושי להיות מישהו שאפשר לסמוך עליו לאורך זמן."
+                    ),
+                    "now": "אם יש כימיה אבל חוסר יציבות — זה בדיוק המתח של הקלף.",
+                    "do": "שמרו על המשחק, ותנו גם עוגן אחד קבוע: זמן קבוע / הודעה ברורה / תוכנית קטנה.",
+                },
+                {
+                    "id": "path",
+                    "question": "אתם בונים דרך משותפת — או רק נהנים מההתחלה?",
+                    "answer": (
+                        "עם השוטה הכימיה לבד לא מספיקה. "
+                        "הפוטנציאל מתממש כשיש גם חופש וגם בחירה להישאר."
+                    ),
+                    "now": "זה הרגע להבין לאן הקשר הזה הולך אצלכם.",
+                    "do": "ענו יחד במשפט אחד: «אנחנו רוצים לבנות ___ ביחד.» ואז עשו צעד קטן לשם.",
                 },
             ],
         },
