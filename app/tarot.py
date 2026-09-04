@@ -17,21 +17,23 @@ MAJOR_ARCANA: list[dict[str, Any]] = [
         "element": "Air",
         "keywords": ["beginnings", "leap", "trust"],
         "traits": ["adventurous", "open-hearted", "unburdened"],
-        "love": "An open beginning that asks for courage more than certainty.",
+        "love": "An open, exciting connection. The lesson: don't run when it's time to choose. If you stay — there is somewhere to go.",
         "love_long": (
             "The Fool brings air into a relationship — laughter, movement, "
-            "the feeling that something new can start. When balanced: open-hearted, "
-            "light, willing to try without smothering. When unbalanced: freedom turns "
-            "into distance; commitment feels like a cage and plans slip away. "
-            "Chemistry alone is not enough — ask together: are we building a path, "
-            "or only enjoying the beginning?"
+            "the feeling that something new can start. At first it feels light and true. "
+            "When balanced: open-hearted, gives space, keeps the bond alive. "
+            "When unbalanced: freedom turns into distance; commitment feels like a cage "
+            "and plans slip away. Chemistry alone is not enough — ask together: "
+            "are we building a path, or only enjoying the beginning? "
+            "If both want freedom and the choice to stay, this can be a living bond. "
+            "If only one wants to stay and the other only wants to run forward, pain appears."
         ),
-        "balanced": "Alive, spontaneous, and honest — freedom inside the bond.",
-        "unbalanced": "Avoids commitment, stays too light, slides out when it gets real.",
+        "balanced": "Alive and spontaneous — freedom inside the choice to stay.",
+        "unbalanced": "Fear of commitment, escape from structure, hard to stay steady when it gets real.",
         "questions": [
-            "Where do you already feel most free together?",
-            "Is this a real beginning — or mainly an escape from what came before?",
-            "What small step this week adds courage without losing steadiness?",
+            "Where do you feel most free together in this connection?",
+            "Is this a full choice — or a need to feel free from what came before?",
+            "What small step this week strengthens courage without losing steadiness?",
         ],
     },
     {
@@ -260,7 +262,8 @@ ELEMENT_HE = {"Fire": "אש", "Water": "מים", "Air": "אוויר", "Earth": "
 HE_CARDS = {
     0: {
         "name": "השוטה",
-        "love": "התחלה פתוחה שמבקשת אומץ יותר מוודאות.",
+        # 1) short message  2) long message  3) green-path questions
+        "love": "חיבור פתוח ומרגש. השיעור: לא לברוח כשצריך לבחור. אם תישארו — יש לאן ללכת.",
         "traits": ["לב פתוח", "ספונטני", "מחפש חופש"],
         "love_long": (
             "השוטה מביא לקשר אוויר — צחוק, תנועה, תחושה ש«אפשר להתחיל משהו חדש». "
