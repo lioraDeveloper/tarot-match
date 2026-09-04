@@ -17,7 +17,22 @@ MAJOR_ARCANA: list[dict[str, Any]] = [
         "element": "Air",
         "keywords": ["beginnings", "leap", "trust"],
         "traits": ["adventurous", "open-hearted", "unburdened"],
-        "love": "A first spark that asks for courage more than certainty.",
+        "love": "An open beginning that asks for courage more than certainty.",
+        "love_long": (
+            "The Fool brings air into a relationship — laughter, movement, "
+            "the feeling that something new can start. When balanced: open-hearted, "
+            "light, willing to try without smothering. When unbalanced: freedom turns "
+            "into distance; commitment feels like a cage and plans slip away. "
+            "Chemistry alone is not enough — ask together: are we building a path, "
+            "or only enjoying the beginning?"
+        ),
+        "balanced": "Alive, spontaneous, and honest — freedom inside the bond.",
+        "unbalanced": "Avoids commitment, stays too light, slides out when it gets real.",
+        "questions": [
+            "Where do you already feel most free together?",
+            "Is this a real beginning — or mainly an escape from what came before?",
+            "What small step this week adds courage without losing steadiness?",
+        ],
     },
     {
         "id": 1,
@@ -243,7 +258,30 @@ ARCHETYPE_BY_ELEMENT = {
 ELEMENT_HE = {"Fire": "אש", "Water": "מים", "Air": "אוויר", "Earth": "אדמה"}
 
 HE_CARDS = {
-    0: {"name": "הכסיל", "love": "ניצוץ ראשון שמבקש אומץ יותר מוודאות.", "traits": ["הרפתקני", "לב פתוח", "נטול משא"]},
+    0: {
+        "name": "השוטה",
+        "love": "התחלה פתוחה שמבקשת אומץ יותר מוודאות.",
+        "traits": ["לב פתוח", "ספונטני", "מחפש חופש"],
+        "love_long": (
+            "השוטה מביא לקשר אוויר — צחוק, תנועה, תחושה ש«אפשר להתחיל משהו חדש». "
+            "בהתחלה זה מרגיש קל ונכון: חיבור שלא צריך להסביר יותר מדי. "
+            "כשזה טוב הוא לא חונק, נותן מרחב, ושומר על חיים בתוך הזוגיות. "
+            "כשזה מתעקם אותו חופש הופך למרחק: קשה לסגור תוכניות, קשה לדבר על מחר, "
+            "וברגע שצריך ודאות הוא נעשה קל מדי או מתחמק. "
+            "לא תמיד בכוונה רעה — פשוט מחויבות עלולה להרגיש לו כמו כלוב. "
+            "עם השוטה הכימיה לבד לא מספיקה. צריך לשאול יחד: "
+            "אנחנו בונים דרך — או רק נהנים מההתחלה? "
+            "אם שני הצדדים רוצים גם חופש וגם בחירה להישאר — יש כאן זוגיות חיה. "
+            "אם רק אחד רוצה להישאר והשני רק לברוח קדימה — יופיע כאב."
+        ),
+        "balanced": "קשר חי וספונטני — חופש בתוך בחירה להישאר יחד.",
+        "unbalanced": "פחד ממחויבות, בריחה ממסגרת, קושי להיות יציב כשזה נהיה רציני.",
+        "questions": [
+            "איפה בקשר הזה אתם מרגישים הכי חופשיים?",
+            "האם זו בחירה מלאה — או צורך להרגיש חופשיים ממה שהיה קודם?",
+            "איזה צעד קטן השבוע יחזק אומץ בלי לאבד יציבות?",
+        ],
+    },
     1: {"name": "הקוסם", "love": "כימיה שאפשר ממש לעצב למשהו אמיתי.", "traits": ["כריזמטי", "ממוקד", "תושייה"]},
     2: {"name": "הכהנת הגדולה", "love": "משיכה שחיה במבטים, בחלומות ובתזמון.", "traits": ["אינטואיטיבי", "שמור", "מגנטי"]},
     3: {"name": "הקיסרית", "love": "אהבה שרוצה מגע, חום, ומי שמשקיע.", "traits": ["חמים", "חושני", "יצירתי"]},
@@ -278,7 +316,7 @@ def card_payload(card_id: int, lang: str = "en") -> dict[str, Any]:
     card = CARD_BY_ID[card_id]
     he = HE_CARDS[card_id]
     if lang == "he":
-        return {
+        payload = {
             "id": card["id"],
             "name": he["name"],
             "element": ELEMENT_HE[card["element"]],
@@ -287,15 +325,23 @@ def card_payload(card_id: int, lang: str = "en") -> dict[str, Any]:
             "traits": he["traits"],
             "love": he["love"],
         }
-    return {
-        "id": card["id"],
-        "name": card["name"],
-        "element": card["element"],
-        "element_key": card["element"],
-        "keywords": card["keywords"],
-        "traits": card["traits"],
-        "love": card["love"],
-    }
+        src = he
+    else:
+        payload = {
+            "id": card["id"],
+            "name": card["name"],
+            "element": card["element"],
+            "element_key": card["element"],
+            "keywords": card["keywords"],
+            "traits": card["traits"],
+            "love": card["love"],
+        }
+        src = card
+    # Green-path fields when curated (card-by-card learning).
+    for key in ("love_long", "balanced", "unbalanced", "questions"):
+        if src.get(key):
+            payload[key] = src[key]
+    return payload
 
 
 def dominant_element(cards: list[dict[str, Any]]) -> str:
@@ -505,14 +551,21 @@ def interpret_union_spread(
     labels = UNION_POSITION_LABELS[lang]
     cards = []
     for pos, card in zip(UNION_POSITIONS, drawn):
-        cards.append(
-            {
-                "position": pos,
-                "label": labels[pos],
-                "card": card,
-                "teach": card["love"],
-            }
-        )
+        entry = {
+            "position": pos,
+            "label": labels[pos],
+            "card": card,
+            "teach": card["love"],
+        }
+        if card.get("love_long"):
+            entry["teach_long"] = card["love_long"]
+        if card.get("questions"):
+            entry["questions"] = card["questions"]
+        if card.get("balanced"):
+            entry["balanced"] = card["balanced"]
+        if card.get("unbalanced"):
+            entry["unbalanced"] = card["unbalanced"]
+        cards.append(entry)
     bond, lesson, path = drawn
     if lang == "he":
         message = (
