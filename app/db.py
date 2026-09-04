@@ -55,6 +55,9 @@ def _migrate(conn: sqlite3.Connection) -> None:
     messages = _column_names(conn, "messages")
     if "image_url" not in messages:
         conn.execute("ALTER TABLE messages ADD COLUMN image_url TEXT")
+    matches = _column_names(conn, "matches")
+    if "shared_spread" not in matches:
+        conn.execute("ALTER TABLE matches ADD COLUMN shared_spread TEXT")
 
 
 def init_db() -> None:
@@ -88,6 +91,7 @@ def init_db() -> None:
                 user_id_2 TEXT NOT NULL,
                 compatibility_score REAL NOT NULL,
                 mystical_reasoning TEXT NOT NULL,
+                shared_spread TEXT,
                 status TEXT NOT NULL CHECK (status IN ('active', 'unmatched')),
                 created_at TEXT NOT NULL,
                 FOREIGN KEY (user_id_1) REFERENCES users(id),
@@ -369,16 +373,23 @@ def list_discoverable(user: dict[str, Any]) -> list[dict[str, Any]]:
     return list_candidates(user, exclude_existing=False)
 
 
-def create_match(user_id_1: str, user_id_2: str, score: float, reasoning: str) -> dict[str, Any]:
+def create_match(
+    user_id_1: str,
+    user_id_2: str,
+    score: float,
+    reasoning: str,
+    shared_spread: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     mid = new_id()
     created = now_iso()
+    payload = json.dumps(shared_spread) if shared_spread is not None else None
     with tx() as conn:
         conn.execute(
             """
-            INSERT INTO matches (id, user_id_1, user_id_2, compatibility_score, mystical_reasoning, status, created_at)
-            VALUES (?, ?, ?, ?, ?, 'active', ?)
+            INSERT INTO matches (id, user_id_1, user_id_2, compatibility_score, mystical_reasoning, shared_spread, status, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, 'active', ?)
             """,
-            (mid, user_id_1, user_id_2, score, reasoning, created),
+            (mid, user_id_1, user_id_2, score, reasoning, payload, created),
         )
     return get_match(mid)
 
@@ -388,7 +399,19 @@ def get_match(match_id: str) -> dict[str, Any] | None:
     row = conn.execute("SELECT * FROM matches WHERE id = ?", (match_id,)).fetchone()
     if not row:
         return None
-    return dict(row)
+    return _decode_match(dict(row))
+
+
+def _decode_match(row: dict[str, Any]) -> dict[str, Any]:
+    raw = row.get("shared_spread")
+    if isinstance(raw, str) and raw:
+        try:
+            row["shared_spread"] = json.loads(raw)
+        except json.JSONDecodeError:
+            row["shared_spread"] = None
+    elif not raw:
+        row["shared_spread"] = None
+    return row
 
 
 def find_match_between(user_id_a: str, user_id_b: str) -> dict[str, Any] | None:
@@ -401,24 +424,39 @@ def find_match_between(user_id_a: str, user_id_b: str) -> dict[str, Any] | None:
         """,
         (user_id_a, user_id_b, user_id_b, user_id_a),
     ).fetchone()
-    return dict(row) if row else None
+    return _decode_match(dict(row)) if row else None
 
 
-def get_or_create_match(user_id_1: str, user_id_2: str, score: float, reasoning: str) -> dict[str, Any]:
+def get_or_create_match(
+    user_id_1: str,
+    user_id_2: str,
+    score: float,
+    reasoning: str,
+    shared_spread: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     existing = find_match_between(user_id_1, user_id_2)
     if existing:
         if existing["status"] != "active":
+            payload = json.dumps(shared_spread) if shared_spread is not None else None
             with tx() as conn:
                 conn.execute(
                     """
-                    UPDATE matches SET status = 'active', compatibility_score = ?, mystical_reasoning = ?
+                    UPDATE matches SET status = 'active', compatibility_score = ?, mystical_reasoning = ?,
+                      shared_spread = COALESCE(?, shared_spread)
                     WHERE id = ?
                     """,
-                    (score, reasoning, existing["id"]),
+                    (score, reasoning, payload, existing["id"]),
+                )
+            return get_match(existing["id"])
+        if shared_spread is not None and not existing.get("shared_spread"):
+            with tx() as conn:
+                conn.execute(
+                    "UPDATE matches SET shared_spread = ?, compatibility_score = ?, mystical_reasoning = ? WHERE id = ?",
+                    (json.dumps(shared_spread), score, reasoning, existing["id"]),
                 )
             return get_match(existing["id"])
         return existing
-    return create_match(user_id_1, user_id_2, score, reasoning)
+    return create_match(user_id_1, user_id_2, score, reasoning, shared_spread)
 
 
 def active_match_for(user_id: str) -> dict[str, Any] | None:
@@ -431,7 +469,7 @@ def active_match_for(user_id: str) -> dict[str, Any] | None:
         """,
         (user_id, user_id),
     ).fetchone()
-    return dict(row) if row else None
+    return _decode_match(dict(row)) if row else None
 
 
 def list_active_matches(user_id: str) -> list[dict[str, Any]]:
@@ -443,7 +481,7 @@ def list_active_matches(user_id: str) -> list[dict[str, Any]]:
         """,
         (user_id, user_id),
     ).fetchall()
-    return [dict(r) for r in rows]
+    return [_decode_match(dict(r)) for r in rows]
 
 
 def unmatch_active(user_id: str) -> int:

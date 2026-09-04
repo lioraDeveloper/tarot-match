@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
+import random
 import urllib.error
 import urllib.request
 from typing import Any
@@ -200,6 +202,20 @@ POSITION_LABELS = {
         "past": "עבר",
         "present": "הווה",
         "future": "עתיד",
+    },
+}
+
+UNION_POSITIONS = ("bond", "lesson", "path")
+UNION_POSITION_LABELS = {
+    "en": {
+        "bond": "Our bond",
+        "lesson": "What we learn together",
+        "path": "Where this leads",
+    },
+    "he": {
+        "bond": "החיבור שלנו",
+        "lesson": "מה נלמד יחד",
+        "path": "לאן זה מוביל",
     },
 }
 
@@ -451,6 +467,89 @@ def _maybe_llm_interpret(signature: dict[str, Any], spread: dict[str, Any], lang
     except (urllib.error.URLError, TimeoutError, KeyError, json.JSONDecodeError, ValueError):
         pass
     return {"energy_signature": signature, "last_spread": spread}
+
+
+def pick_union_card_ids(sig_a: dict[str, Any] | None, sig_b: dict[str, Any] | None, pair_key: str) -> list[int]:
+    """Deterministic three-card draw for a pair — same cards for both people."""
+    seed = int(hashlib.sha256(pair_key.encode("utf-8")).hexdigest()[:12], 16)
+    rng = random.Random(seed)
+    a_cards = list((sig_a or {}).get("card_ids") or [])
+    b_cards = list((sig_b or {}).get("card_ids") or [])
+    chosen: list[int] = []
+    if a_cards:
+        chosen.append(a_cards[rng.randrange(len(a_cards))])
+    if b_cards:
+        pool_b = [c for c in b_cards if c not in chosen] or b_cards
+        pick = pool_b[rng.randrange(len(pool_b))]
+        if pick not in chosen:
+            chosen.append(pick)
+    bridges = [6, 14, 17, 19, 21, 8, 10, 3]
+    while len(chosen) < 3:
+        pool = [c for c in bridges if c not in chosen] or [i for i in range(22) if i not in chosen]
+        chosen.append(pool[rng.randrange(len(pool))])
+    return chosen[:3]
+
+
+def interpret_union_spread(
+    card_ids: list[int],
+    name_a: str,
+    name_b: str,
+    score: float,
+    lang: str = "en",
+) -> dict[str, Any]:
+    """Shared three-card reading both people learn together on a match."""
+    lang = normalize_lang(lang)
+    if len(card_ids) != 3 or len(set(card_ids)) != 3:
+        raise ValueError("Union spread needs three distinct cards.")
+    drawn = [card_payload(cid, lang) for cid in card_ids]
+    labels = UNION_POSITION_LABELS[lang]
+    cards = []
+    for pos, card in zip(UNION_POSITIONS, drawn):
+        cards.append(
+            {
+                "position": pos,
+                "label": labels[pos],
+                "card": card,
+                "teach": card["love"],
+            }
+        )
+    bond, lesson, path = drawn
+    if lang == "he":
+        message = (
+            f"{name_a} ו{name_b} — החיבור שלכם נפרש בשלושה קלפים שנלמדים יחד. "
+            f"{labels['bond']}: {bond['name']} — {bond['love']} "
+            f"{labels['lesson']}: {lesson['name']} — {lesson['love']} "
+            f"{labels['path']}: {path['name']} — {path['love']}"
+        )
+        headline = f"שלושה קלפים בשבילכם · {int(round(score))}%"
+        subtitle = "הקלפים האלה שייכים לשני הצדדים — ללמוד אותם יחד, ואז לדבר."
+    else:
+        message = (
+            f"{name_a} & {name_b} — your match unfolds in three cards you learn together. "
+            f"{labels['bond']}: {bond['name']} — {bond['love']} "
+            f"{labels['lesson']}: {lesson['name']} — {lesson['love']} "
+            f"{labels['path']}: {path['name']} — {path['love']}"
+        )
+        headline = f"Three cards for both of you · {int(round(score))}%"
+        subtitle = "These cards belong to both of you — learn them together, then talk."
+    return {
+        "card_ids": card_ids,
+        "cards": cards,
+        "headline": headline,
+        "subtitle": subtitle,
+        "message": message,
+        "score": float(score),
+        "lang": lang,
+    }
+
+
+def localize_union_spread(stored: dict[str, Any] | None, name_a: str, name_b: str, score: float, lang: str) -> dict[str, Any] | None:
+    if not stored:
+        return None
+    ids = stored.get("card_ids")
+    if not ids or len(ids) != 3:
+        return None
+    return interpret_union_spread(ids, name_a, name_b, score, lang=lang)
 
 
 def compatibility(a: dict[str, Any], b: dict[str, Any], lang: str = "en") -> tuple[float, str]:

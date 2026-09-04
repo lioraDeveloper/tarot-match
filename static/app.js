@@ -27,6 +27,7 @@ const state = {
   mobileThread: false,
   deferredInstall: null,
   showInstall: false,
+  union: null, // { phase: 'shuffle'|'reveal', match, partnerName }
 };
 
 const $app = document.getElementById("app");
@@ -128,6 +129,7 @@ function navigate(view) {
   }
   state.view = view;
   state.error = "";
+  if (view !== "union") state.union = null;
   if (view !== "chat") state.mobileThread = false;
   render();
   if (view === "discover") loadDiscover();
@@ -484,7 +486,11 @@ function chatView() {
         </div>
         <button type="button" class="ghost small" id="unmatch">${esc(t("unmatch"))}</button>
       </div>
-      <div class="pin"><strong>${esc(t("cosmicInsight"))}</strong> ${esc(m.mystical_reasoning || "")}</div>
+      <div class="pin">
+        <strong>${esc(t("sharedCards"))}</strong>
+        ${m.shared_spread?.cards ? `<div class="pin-cards">${m.shared_spread.cards.map((c) => `<span>${esc(c.label)}: ${esc(cardName(c.card.id))}</span>`).join(" · ")}</div>` : ""}
+        <p>${esc(m.mystical_reasoning || "")}</p>
+      </div>
       <div class="msgs" id="msgs">${bubbles || `<p class="muted">${esc(t("firstWord"))}</p>`}</div>
       <form class="composer" id="send-form">
         <label class="icon-btn" title="${esc(t("sendPhoto"))}">
@@ -512,6 +518,9 @@ function discoverView() {
   const cards = state.discover.map((item) => {
     const u = item.user;
     const cta = item.already_chatting ? t("openChat") : t("messageCta");
+    const action = item.already_chatting && item.match_id
+      ? `data-open-chat="${esc(item.match_id)}"`
+      : `data-message="${esc(u.id)}"`;
     return `<article class="person-card">
       ${avatarHtml(u, "avatar-xl")}
       <div class="person-score">${Math.round(item.compatibility_score)}%</div>
@@ -519,7 +528,7 @@ function discoverView() {
       <p class="gold">${esc(u.energy_signature?.archetype || "")}</p>
       <p class="muted person-bio">${esc(u.bio || "")}</p>
       ${u.is_bot ? `<p class="pill">${esc(t("trialBot"))}</p>` : ""}
-      <button class="primary" data-message="${esc(u.id)}">${esc(cta)}</button>
+      <button class="primary" ${action}>${esc(cta)}</button>
     </article>`;
   }).join("");
   return `${navBar()}<div class="shell">
@@ -528,6 +537,58 @@ function discoverView() {
     <p class="muted">${esc(t("discoverBody"))}</p>
     <p class="error">${esc(state.error)}</p>
     <div class="discover-grid">${cards || `<p class="muted">${esc(t("noMatch"))}</p>`}</div>
+  </div>`;
+}
+
+function unionCardFace(entry, revealed) {
+  const c = entry.card;
+  const id = c.id;
+  return `<div class="union-card ${revealed ? "revealed" : ""}" style="--card-hue:${(id * 17) % 360}">
+    <div class="face back">
+      <span class="back-roman">${ROMAN[id]}</span>
+      <div class="back-art" aria-hidden="true">${CARD_SVG[id]}</div>
+    </div>
+    <div class="face front">
+      <div class="roman">${ROMAN[id]}</div>
+      ${CARD_SVG[id]}
+      <div class="cname">${esc(cardName(id))}</div>
+    </div>
+  </div>
+  <div class="union-meta">
+    <div class="pos">${esc(entry.label)}</div>
+    ${revealed ? `<div class="picked">${esc(cardName(id))}</div><p class="muted union-teach">${esc(entry.teach || "")}</p>` : `<div class="picked">…</div>`}
+  </div>`;
+}
+
+function unionView() {
+  const u = state.union;
+  if (!u) return discoverView();
+  const spread = u.match?.shared_spread;
+  const cards = (spread?.cards || []).map((entry, i) => {
+    const show = u.phase === "reveal" && i < u.revealedCount;
+    return `<div class="union-slot">${unionCardFace(entry, show)}</div>`;
+  }).join("");
+  const partner = u.match?.partner || {};
+  const shuffling = u.phase === "shuffle";
+  return `${navBar()}<div class="shell center union-shell">
+    <p class="hero-kicker">${esc(t("unionTogether"))}</p>
+    <h1>${esc(shuffling ? t("unionShuffling") : t("unionReveal"))}</h1>
+    <div class="union-pair">
+      ${avatarHtml(state.user, "avatar-lg")}
+      <span class="gold union-amp">✦</span>
+      ${avatarHtml(partner, "avatar-lg")}
+    </div>
+    <p class="muted">${esc(partner.name || "")}${partner.age ? `, ${partner.age}` : ""}</p>
+    <div class="union-deck ${shuffling ? "shuffling" : ""}">${cards}</div>
+    ${u.phase === "reveal" && u.revealedCount >= 3 ? `
+      <div class="card-panel union-message">
+        <div class="score">${Math.round(u.match.compatibility_score)}%</div>
+        <p class="insight">${esc(spread?.message || u.match.mystical_reasoning || "")}</p>
+        <div class="actions" style="justify-content:center">
+          <button class="primary" id="union-to-chat">${esc(t("unionOpenChat"))}</button>
+        </div>
+      </div>
+    ` : `<p class="error">${esc(state.error)}</p>`}
   </div>`;
 }
 
@@ -591,6 +652,7 @@ function render() {
     chat: chatView,
     discover: discoverView,
     profile: profileView,
+    union: unionView,
   };
   const draft = document.querySelector("#send-form input[name='content']")?.value;
   const body = (map[state.view] || landing)();
@@ -674,6 +736,23 @@ function bind() {
     state.showInstall = false;
     localStorage.setItem("aether_install_dismissed", "1");
     render();
+  });
+  const unionChat = document.getElementById("union-to-chat");
+  if (unionChat) unionChat.addEventListener("click", async () => {
+    if (!state.union?.match) return;
+    state.match = state.union.match;
+    state.union = null;
+    state.mobileThread = true;
+    try {
+      await loadChat(state.match.id);
+      await refreshInbox();
+      state.view = "chat";
+      render();
+    } catch (err) {
+      state.error = err.message;
+      state.view = "discover";
+      render();
+    }
   });
 }
 
@@ -816,14 +895,42 @@ async function openExistingChat(matchId) {
 }
 
 async function openWithPerson(userId) {
+  state.error = "";
+  state.union = {
+    phase: "shuffle",
+    match: { partner: state.discover.find((p) => p.user.id === userId)?.user || { id: userId, name: "…" }, compatibility_score: 0, shared_spread: { cards: [
+      { label: "…", card: { id: 0 }, teach: "" },
+      { label: "…", card: { id: 1 }, teach: "" },
+      { label: "…", card: { id: 2 }, teach: "" },
+    ] } },
+    revealedCount: 0,
+  };
+  state.view = "union";
+  render();
   try {
     const data = await api("/api/match/open", { method: "POST", body: JSON.stringify({ user_id: userId }) });
     state.match = data.match;
-    await loadChat(data.match.id);
-    state.mobileThread = true;
-    navigate("chat");
+    state.union.match = data.match;
+    // Keep shuffling briefly, then reveal cards one by one.
+    setTimeout(() => {
+      if (state.view !== "union" || !state.union) return;
+      state.union.phase = "reveal";
+      state.union.revealedCount = 0;
+      render();
+      let n = 0;
+      const tick = () => {
+        if (state.view !== "union" || !state.union) return;
+        n += 1;
+        state.union.revealedCount = n;
+        render();
+        if (n < 3) setTimeout(tick, 450);
+      };
+      setTimeout(tick, 350);
+    }, 1600);
   } catch (err) {
     state.error = err.message;
+    state.union = null;
+    state.view = "discover";
     render();
   }
 }
