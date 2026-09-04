@@ -30,11 +30,39 @@ MAJOR_ARCANA: list[dict[str, Any]] = [
         ),
         "balanced": "Alive and spontaneous — freedom inside the choice to stay.",
         "unbalanced": "Fear of commitment, escape from structure, hard to stay steady when it gets real.",
-        "questions": [
-            "Where do you feel most free together in this connection?",
-            "Is this a full choice — or a need to feel free from what came before?",
-            "What small step this week strengthens courage without losing steadiness?",
-        ],
+        "green_path": {
+            "title": "Want to know more about yourselves?",
+            "intro": "The Fool opened a living beginning. Now check together what strengthens the bond — and what may pull you apart.",
+            "focus_question": "What do you want to work on first?",
+            "focus_options": [
+                "Freedom without running",
+                "Staying when it gets real",
+                "Building shared plans",
+                "Keeping healthy lightness",
+            ],
+            "questions": [
+                {
+                    "id": "free",
+                    "prompt": "Where in this connection do you feel most free together?",
+                    "hint": "Each write one sentence, then share.",
+                },
+                {
+                    "id": "choose",
+                    "prompt": "When it's time to choose and stay — what happens for you?",
+                    "options": [
+                        "We stay and talk",
+                        "One stays and one pulls away",
+                        "We both get scared and go too light",
+                        "We haven't really tested this yet",
+                    ],
+                },
+                {
+                    "id": "next",
+                    "prompt": "What small step will you take this week to build a path — not only a beginning?",
+                    "hint": "Something simple: a plan, a talk, or a small promise you both keep.",
+                },
+            ],
+        },
     },
     {
         "id": 1,
@@ -262,7 +290,7 @@ ELEMENT_HE = {"Fire": "אש", "Water": "מים", "Air": "אוויר", "Earth": "
 HE_CARDS = {
     0: {
         "name": "השוטה",
-        # 1) short message  2) long message  3) green-path questions
+        # short match line + green-path quiz (long text is internal source only)
         "love": "חיבור פתוח ומרגש. השיעור: לא לברוח כשצריך לבחור. אם תישארו — יש לאן ללכת.",
         "traits": ["לב פתוח", "ספונטני", "מחפש חופש"],
         "love_long": (
@@ -279,11 +307,39 @@ HE_CARDS = {
         ),
         "balanced": "קשר חי וספונטני — חופש בתוך בחירה להישאר יחד.",
         "unbalanced": "פחד ממחויבות, בריחה ממסגרת, קושי להיות יציב כשזה נהיה רציני.",
-        "questions": [
-            "איפה בקשר הזה אתם מרגישים הכי חופשיים?",
-            "האם זו בחירה מלאה — או צורך להרגיש חופשיים ממה שהיה קודם?",
-            "איזה צעד קטן השבוע יחזק אומץ בלי לאבד יציבות?",
-        ],
+        "green_path": {
+            "title": "רוצים להכיר אתכם יותר?",
+            "intro": "השוטה פתח לכם התחלה חיה. עכשיו נבדוק יחד מה מחזק את הקשר ומה עלול להרחיק.",
+            "focus_question": "על מה אתם רוצים לעבוד קודם?",
+            "focus_options": [
+                "חופש בלי לברוח",
+                "להישאר גם כשזה נהיה רציני",
+                "לבנות תוכניות משותפות",
+                "לשמור על קלילות בריאה",
+            ],
+            "questions": [
+                {
+                    "id": "free",
+                    "prompt": "איפה בקשר הזה אתם מרגישים הכי חופשיים יחד?",
+                    "hint": "רשמו משפט אחד כל אחד, ואז שתפו.",
+                },
+                {
+                    "id": "choose",
+                    "prompt": "כשצריך לבחור ולהישאר — מה קורה אצלכם?",
+                    "options": [
+                        "אנחנו נשארים ומדברים",
+                        "אחד נשאר ואחד מתרחק",
+                        "שנינו נבהלים ונהיים קלים מדי",
+                        "עוד לא בדקנו את זה באמת",
+                    ],
+                },
+                {
+                    "id": "next",
+                    "prompt": "איזה צעד קטן תעשו השבוע כדי לבנות דרך — לא רק להתחיל?",
+                    "hint": "משהו פשוט: תוכנית, שיחה, או הבטחה קטנה ששניכם עומדים בה.",
+                },
+            ],
+        },
     },
     1: {"name": "הקוסם", "love": "כימיה שאפשר ממש לעצב למשהו אמיתי.", "traits": ["כריזמטי", "ממוקד", "תושייה"]},
     2: {"name": "הכהנת הגדולה", "love": "משיכה שחיה במבטים, בחלומות ובתזמון.", "traits": ["אינטואיטיבי", "שמור", "מגנטי"]},
@@ -340,8 +396,8 @@ def card_payload(card_id: int, lang: str = "en") -> dict[str, Any]:
             "love": card["love"],
         }
         src = card
-    # Green-path fields when curated (card-by-card learning).
-    for key in ("love_long", "balanced", "unbalanced", "questions"):
+    # Green-path / curated fields when present.
+    for key in ("love_long", "balanced", "unbalanced", "questions", "green_path"):
         if src.get(key):
             payload[key] = src[key]
     return payload
