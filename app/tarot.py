@@ -105,8 +105,58 @@ MAJOR_ARCANA: list[dict[str, Any]] = [
         "name": "The Magician",
         "element": "Air",
         "keywords": ["will", "manifestation", "skill"],
-        "traits": ["charismatic", "focused", "resourceful"],
-        "love": "Chemistry you can actually shape into something real.",
+        "traits": ["charismatic", "focused", "creative"],
+        "love": "You have chemistry you can shape. The lesson: don't only feel — also act. If you move together, it becomes real.",
+        "love_long": (
+            "The Magician says a bond does not only 'happen' — you can build it. "
+            "You have tools: words, intention, actions, attention. "
+            "Balanced: you create together, speak clearly, and turn chemistry into choice. "
+            "Unbalanced: beautiful talk without follow-through, control, or impressing instead of connecting."
+        ),
+        "balanced": "Chemistry with action — creating together in clarity.",
+        "unbalanced": "Talk without action, control, or performance instead of real connection.",
+        "green_path": {
+            "title": "Want to know more about yourselves?",
+            "intro": "Each topic in two lines: orange = where you are now · green = what to fix.",
+            "items": [
+                {
+                    "id": "chemistry",
+                    "question": "Is your chemistry accidental — or are you creating it?",
+                    "now": "There is spark and pull, but it is not yet clear if both of you are building it on purpose.",
+                    "fix": "Choose one small act together that creates closeness — don't only wait for it to 'happen'.",
+                },
+                {
+                    "id": "words",
+                    "question": "Do your words connect you — or only sound good?",
+                    "now": "There is chemistry in conversation, sometimes without continuation in reality.",
+                    "fix": "Turn one sentence into a small promise you both keep this week.",
+                },
+                {
+                    "id": "focus",
+                    "question": "Are you focused on each other — or scattered?",
+                    "now": "There is interest, but attention sometimes drifts elsewhere.",
+                    "fix": "Give the bond one focused time this week — no phone, no distractions.",
+                },
+                {
+                    "id": "power",
+                    "question": "Is the power between you shared — or does one lead alone?",
+                    "now": "There is a dynamic of influence; check whether it is respectful or controlling.",
+                    "fix": "Ask together: who is leading now — and how do we make room for both voices.",
+                },
+                {
+                    "id": "tools",
+                    "question": "What are your tools as a couple?",
+                    "now": "You have skills to connect: talk, humor, initiative — you don't always use them.",
+                    "fix": "Pick one tool that already works for you — and amplify it on purpose.",
+                },
+                {
+                    "id": "real",
+                    "question": "Are you creating a real bond — or only an impression?",
+                    "now": "There is strong potential to turn chemistry into something tangible.",
+                    "fix": "Take one concrete step: a plan, a deeper conversation, or a clear choice to continue.",
+                },
+            ],
+        },
     },
     {
         "id": 2,
@@ -386,7 +436,61 @@ HE_CARDS = {
             ],
         },
     },
-    1: {"name": "הקוסם", "love": "כימיה שאפשר ממש לעצב למשהו אמיתי.", "traits": ["כריזמטי", "ממוקד", "תושייה"]},
+    1: {
+        "name": "הקוסם",
+        "love": "יש ביניכם כימיה שאפשר לעצב. השיעור: לא רק להרגיש — גם לעשות. אם תפעלו יחד — זה נהיה אמיתי.",
+        "traits": ["כריזמטי", "ממוקד", "יוצר"],
+        "love_long": (
+            "הקוסם אומר שהקשר לא רק «קורה» — אפשר לבנות אותו. "
+            "יש כלים: מילים, כוונה, מעשים, תשומת לב. "
+            "כשזה מאוזן: שניכם יוצרים יחד, מדברים בבהירות, והכימיה הופכת לבחירה. "
+            "כשזה לא מאוזן: יש דיבור יפה בלי מעשה, שליטה, או ניסיון להרשים במקום לחבר באמת."
+        ),
+        "balanced": "כימיה עם מעשה — יוצרים יחד בבהירות.",
+        "unbalanced": "דיבור בלי מעשה, שליטה, או הצגה במקום חיבור אמיתי.",
+        "green_path": {
+            "title": "רוצים להכיר אתכם יותר?",
+            "intro": "כל נושא בשתי שורות: כתום = איפה אתם עכשיו · ירוק = מה לתקן.",
+            "items": [
+                {
+                    "id": "chemistry",
+                    "question": "הכימיה אצלכם מקרית — או שאתם יוצרים אותה?",
+                    "now": "יש משיכה וניצוץ, אבל עוד לא ברור אם שניכם בונים אותה בכוונה.",
+                    "fix": "בחרו יחד מעשה קטן אחד שיוצר קרבה — לא רק מחכים ש«זה יקרה».",
+                },
+                {
+                    "id": "words",
+                    "question": "המילים שלכם מחברות — או רק נשמעות יפות?",
+                    "now": "יש שיחות וכימיה במילים, לפעמים בלי המשך במציאות.",
+                    "fix": "הפכו משפט אחד להבטחה קטנה ששניכם מקיימים השבוע.",
+                },
+                {
+                    "id": "focus",
+                    "question": "אתם ממוקדים אחד בשני — או מפוזרים?",
+                    "now": "יש עניין, אבל תשומת הלב לפעמים בורחת למקומות אחרים.",
+                    "fix": "תנו לקשר זמן ממוקד אחד השבוע — בלי טלפון, בלי הסחות.",
+                },
+                {
+                    "id": "power",
+                    "question": "הכוח ביניכם משותף — או שאחד מנהל?",
+                    "now": "יש דינמיקה של השפעה; חשוב לבדוק אם היא מכבדת או שולטת.",
+                    "fix": "שאלו יחד: מי מוביל עכשיו — ואיך עושים מקום לשני הקולות.",
+                },
+                {
+                    "id": "tools",
+                    "question": "מה הכלים שלכם כזוג?",
+                    "now": "יש לכם כישורים לחבר: דיבור, הומור, יוזמה — לא תמיד משתמשים בהם.",
+                    "fix": "בחרו כלי אחד שכבר עובד אצלכם — והגבירו אותו במודע.",
+                },
+                {
+                    "id": "real",
+                    "question": "אתם יוצרים קשר אמיתי — או רק רושם?",
+                    "now": "יש פוטנציאל חזק להפוך כימיה למשהו ממשי.",
+                    "fix": "עשו צעד אחד מוחשי: תוכנית, הכרות עמוקה יותר, או בחירה ברורה להמשיך.",
+                },
+            ],
+        },
+    },
     2: {"name": "הכהנת הגדולה", "love": "משיכה שחיה במבטים, בחלומות ובתזמון.", "traits": ["אינטואיטיבי", "שמור", "מגנטי"]},
     3: {"name": "הקיסרית", "love": "אהבה שרוצה מגע, חום, ומי שמשקיע.", "traits": ["חמים", "חושני", "יצירתי"]},
     4: {"name": "הקיסר", "love": "ביטחון כשפת אהבה — עמוד שדרה לתשוקה.", "traits": ["יציב", "מגן", "החלטי"]},
