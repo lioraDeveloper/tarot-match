@@ -773,6 +773,12 @@ function bind() {
       render();
     }
   });
+  const unionGreen = document.getElementById("union-green");
+  if (unionGreen) unionGreen.addEventListener("click", () => {
+    if (!state.union) return;
+    state.union.showGreen = true;
+    render();
+  });
 }
 
 async function onAuth(e) {
