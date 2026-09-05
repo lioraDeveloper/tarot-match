@@ -10,6 +10,10 @@ import urllib.error
 import urllib.request
 from typing import Any
 
+from app.content_loader import merge_published
+
+# Public skeleton only. Secret / editorial copy lives in content/vault/published
+# (source + drafts are for study; app never auto-loads them).
 MAJOR_ARCANA: list[dict[str, Any]] = [
     {
         "id": 0,
@@ -17,73 +21,7 @@ MAJOR_ARCANA: list[dict[str, Any]] = [
         "element": "Air",
         "keywords": ["beginnings", "leap", "trust"],
         "traits": ["adventurous", "open-hearted", "unburdened"],
-        "love": "An open, exciting connection. The lesson: don't run when it's time to choose. If you stay — there is somewhere to go.",
-        "love_long": (
-            "The Fool brings air into a relationship — laughter, movement, "
-            "the feeling that something new can start. At first it feels light and true. "
-            "When balanced: open-hearted, gives space, keeps the bond alive. "
-            "When unbalanced: freedom turns into distance; commitment feels like a cage "
-            "and plans slip away. Chemistry alone is not enough — ask together: "
-            "are we building a path, or only enjoying the beginning? "
-            "If both want freedom and the choice to stay, this can be a living bond. "
-            "If only one wants to stay and the other only wants to run forward, pain appears."
-        ),
-        "balanced": "Alive and spontaneous — freedom inside the choice to stay.",
-        "unbalanced": "Fear of commitment, escape from structure, hard to stay steady when it gets real.",
-        "green_path": {
-            "title": "Want to know more about yourselves?",
-            "intro": "",
-            "items": [
-                {
-                    "id": "start",
-                    "question": "Is this a real beginning between you — or only a momentary thrill?",
-                    "answer": (
-                        "The Fool speaks of an open start: air, laughter, the feeling that something "
-                        "new can begin before every answer is ready."
-                    ),
-                },
-                {
-                    "id": "freedom",
-                    "question": "Does freedom bring you closer — or farther apart?",
-                    "answer": (
-                        "In the Fool, freedom is strength when it lives inside the bond. "
-                        "It becomes weakness when it turns into escape from structure and tomorrow."
-                    ),
-                },
-                {
-                    "id": "commitment",
-                    "question": "When it's time to choose and stay — what happens?",
-                    "answer": (
-                        "When the Fool is balanced, there is courage to stay even without full certainty. "
-                        "When unbalanced, commitment feels like a cage and avoidance appears."
-                    ),
-                },
-                {
-                    "id": "approval",
-                    "question": "Are you following what feels true to you — or what looks good from outside?",
-                    "answer": (
-                        "The Fool calls you to follow an inner sense, even if others find it odd. "
-                        "In love, that means choosing the bond from truth, not pressure."
-                    ),
-                },
-                {
-                    "id": "balance",
-                    "question": "How do you keep lightness without losing reliability?",
-                    "answer": (
-                        "The beautiful side of the Fool is aliveness and spontaneity. "
-                        "The weak side is difficulty being someone who can be counted on over time."
-                    ),
-                },
-                {
-                    "id": "path",
-                    "question": "Are you building a shared path — or only enjoying the beginning?",
-                    "answer": (
-                        "With the Fool, chemistry alone is not enough. "
-                        "The potential becomes real when there is freedom and also the choice to stay."
-                    ),
-                },
-            ],
-        },
+        "love": "An open beginning.",
     },
     {
         "id": 1,
@@ -91,54 +29,7 @@ MAJOR_ARCANA: list[dict[str, Any]] = [
         "element": "Air",
         "keywords": ["will", "manifestation", "skill"],
         "traits": ["charismatic", "focused", "creative"],
-        "love": "You have chemistry you can shape. The lesson: don't only feel — also act. If you move together, it becomes real.",
-        "love_long": (
-            "The Magician says a bond does not only 'happen' — you can build it. "
-            "You have tools: words, intention, actions, attention. "
-            "Balanced: you create together, speak clearly, and turn chemistry into choice. "
-            "Unbalanced: beautiful talk without follow-through, control, or impressing instead of connecting."
-        ),
-        "balanced": "Chemistry with action — creating together in clarity.",
-        "unbalanced": "Talk without action, control, or performance instead of real connection.",
-        "green_path": {
-            "title": "Want to know more about yourselves?",
-            "intro": "",
-            "items": [
-                {
-                    "id": "chemistry",
-                    "question": "Is your chemistry accidental — or are you creating it?",
-                    "answer": (
-                        "The Magician says a bond does not only happen — you can build it "
-                        "with intention, words, and action."
-                    ),
-                },
-                {
-                    "id": "words",
-                    "question": "Do your words connect you — or only sound good?",
-                    "answer": "Chemistry in talk matters only when it continues into real follow-through.",
-                },
-                {
-                    "id": "focus",
-                    "question": "Are you focused on each other — or scattered?",
-                    "answer": "Attention is one of your tools — when it drifts, the bond thins.",
-                },
-                {
-                    "id": "power",
-                    "question": "Is the power between you shared — or does one lead alone?",
-                    "answer": "Influence can create or control. Shared will keeps the magic clean.",
-                },
-                {
-                    "id": "tools",
-                    "question": "What are your tools as a couple?",
-                    "answer": "Words, humor, initiative, presence — use what already works on purpose.",
-                },
-                {
-                    "id": "real",
-                    "question": "Are you creating a real bond — or only an impression?",
-                    "answer": "The Magician turns spark into something tangible when both choose to act.",
-                },
-            ],
-        },
+        "love": "Chemistry you can shape.",
     },
     {
         "id": 2,
@@ -355,130 +246,11 @@ ARCHETYPE_BY_ELEMENT = {
 
 ELEMENT_HE = {"Fire": "אש", "Water": "מים", "Air": "אוויר", "Earth": "אדמה"}
 
+# Public Hebrew skeleton only. Editorial copy (love / green_path / long) loads from vault published.
+# Public Hebrew skeleton only. Editorial copy loads from content/vault/published.
 HE_CARDS = {
-    0: {
-        "name": "השוטה",
-        # short match line + green-path quiz (long text is internal source only)
-        "love": "חיבור פתוח ומרגש. השיעור: לא לברוח כשצריך לבחור. אם תישארו — יש לאן ללכת.",
-        "traits": ["לב פתוח", "ספונטני", "מחפש חופש"],
-        "love_long": (
-            "השוטה מביא לקשר אוויר — צחוק, תנועה, תחושה ש«אפשר להתחיל משהו חדש». "
-            "בהתחלה זה מרגיש קל ונכון: חיבור שלא צריך להסביר יותר מדי. "
-            "כשזה טוב הוא לא חונק, נותן מרחב, ושומר על חיים בתוך הזוגיות. "
-            "כשזה מתעקם אותו חופש הופך למרחק: קשה לסגור תוכניות, קשה לדבר על מחר, "
-            "וברגע שצריך ודאות הוא נעשה קל מדי או מתחמק. "
-            "לא תמיד בכוונה רעה — פשוט מחויבות עלולה להרגיש לו כמו כלוב. "
-            "עם השוטה הכימיה לבד לא מספיקה. צריך לשאול יחד: "
-            "אנחנו בונים דרך — או רק נהנים מההתחלה? "
-            "אם שני הצדדים רוצים גם חופש וגם בחירה להישאר — יש כאן זוגיות חיה. "
-            "אם רק אחד רוצה להישאר והשני רק לברוח קדימה — יופיע כאב."
-        ),
-        "balanced": "קשר חי וספונטני — חופש בתוך בחירה להישאר יחד.",
-        "unbalanced": "פחד ממחויבות, בריחה ממסגרת, קושי להיות יציב כשזה נהיה רציני.",
-        "green_path": {
-            "title": "רוצים להכיר אתכם יותר?",
-            "intro": "",
-            "items": [
-                {
-                    "id": "start",
-                    "question": "התחלה אמיתית או רק ריגוש?",
-                    "answer": (
-                        "השוטה מדבר על התחלה פתוחה: אוויר, צחוק, תחושה שמשהו חדש "
-                        "יכול להתחיל עוד לפני שיש את כל התשובות."
-                    ),
-                },
-                {
-                    "id": "freedom",
-                    "question": "החופש מחבר או מרחיק?",
-                    "answer": (
-                        "אצל השוטה חופש הוא כוח כשהוא חי בתוך הקשר. "
-                        "הוא נחלש כשהוא הופך לבריחה ממסגרת וממחר."
-                    ),
-                },
-                {
-                    "id": "commitment",
-                    "question": "כשצריך להישאר — מה קורה?",
-                    "answer": (
-                        "כשהשוטה מאוזן — יש אומץ להישאר גם בלי ודאות מלאה. "
-                        "כשהוא לא מאוזן — מחויבות מרגישה כמו כלוב ומופיעה התחמקות."
-                    ),
-                },
-                {
-                    "id": "approval",
-                    "question": "בוחרים מלב או ממה שייראה טוב?",
-                    "answer": (
-                        "השוטה קורא ללכת אחרי תחושה פנימית, גם אם מבחוץ זה נראה מוזר. "
-                        "באהבה זה אומר לבחור בקשר מתוך אמת, לא מלחץ."
-                    ),
-                },
-                {
-                    "id": "balance",
-                    "question": "איך שומרים על קלילות בלי לאבד אמינות?",
-                    "answer": (
-                        "הצד היפה של השוטה הוא חיות וספונטניות. "
-                        "הצד החלש הוא קושי להיות מישהו שאפשר לסמוך עליו לאורך זמן."
-                    ),
-                },
-                {
-                    "id": "path",
-                    "question": "בונים דרך או רק נהנים מההתחלה?",
-                    "answer": (
-                        "עם השוטה כימיה לבד לא מספיקה. "
-                        "הפוטנציאל נהיה אמיתי כשיש גם חופש וגם בחירה להישאר."
-                    ),
-                },
-            ],
-        },
-    },
-    1: {
-        "name": "הקוסם",
-        "love": "יש ביניכם כימיה שאפשר לעצב. השיעור: לא רק להרגיש — גם לעשות. אם תפעלו יחד — זה נהיה אמיתי.",
-        "traits": ["כריזמטי", "ממוקד", "יוצר"],
-        "love_long": (
-            "הקוסם אומר שהקשר לא רק «קורה» — אפשר לבנות אותו. "
-            "יש כלים: מילים, כוונה, מעשים, תשומת לב. "
-            "כשזה מאוזן: שניכם יוצרים יחד, מדברים בבהירות, והכימיה הופכת לבחירה. "
-            "כשזה לא מאוזן: יש דיבור יפה בלי מעשה, שליטה, או ניסיון להרשים במקום לחבר באמת."
-        ),
-        "balanced": "כימיה עם מעשה — יוצרים יחד בבהירות.",
-        "unbalanced": "דיבור בלי מעשה, שליטה, או הצגה במקום חיבור אמיתי.",
-        "green_path": {
-            "title": "רוצים להכיר אתכם יותר?",
-            "intro": "",
-            "items": [
-                {
-                    "id": "chemistry",
-                    "question": "הכימיה אצלכם מקרית — או שאתם יוצרים אותה?",
-                    "answer": "הקוסם אומר שהקשר לא רק «קורה» — אפשר לבנות אותו עם כוונה, מילים ומעשה.",
-                },
-                {
-                    "id": "words",
-                    "question": "המילים שלכם מחברות — או רק נשמעות יפות?",
-                    "answer": "כימיה בדיבור חשובה רק כשיש לה המשך במציאות.",
-                },
-                {
-                    "id": "focus",
-                    "question": "אתם ממוקדים אחד בשני — או מפוזרים?",
-                    "answer": "תשומת לב היא אחד מהכלים שלכם — כשהיא בורחת, הקשר נחלש.",
-                },
-                {
-                    "id": "power",
-                    "question": "הכוח ביניכם משותף — או שאחד מנהל?",
-                    "answer": "השפעה יכולה ליצור או לשלוט. רצון משותף שומר על הקסם נקי.",
-                },
-                {
-                    "id": "tools",
-                    "question": "מה הכלים שלכם כזוג?",
-                    "answer": "מילים, הומור, יוזמה, נוכחות — להשתמש במודע במה שכבר עובד.",
-                },
-                {
-                    "id": "real",
-                    "question": "אתם יוצרים קשר אמיתי — או רק רושם?",
-                    "answer": "הקוסם הופך ניצוץ למשהו ממשי כששניכם בוחרים לפעול.",
-                },
-            ],
-        },
-    },
+    0: {"name": "השוטה", "love": "התחלה פתוחה.", "traits": ["לב פתוח", "ספונטני", "מחפש חופש"]},
+    1: {"name": "הקוסם", "love": "כימיה שאפשר לעצב.", "traits": ["כריזמטי", "ממוקד", "יוצר"]},
     2: {"name": "הכהנת הגדולה", "love": "משיכה שחיה במבטים, בחלומות ובתזמון.", "traits": ["אינטואיטיבי", "שמור", "מגנטי"]},
     3: {"name": "הקיסרית", "love": "אהבה שרוצה מגע, חום, ומי שמשקיע.", "traits": ["חמים", "חושני", "יצירתי"]},
     4: {"name": "הקיסר", "love": "ביטחון כשפת אהבה — עמוד שדרה לתשוקה.", "traits": ["יציב", "מגן", "החלטי"]},
@@ -533,11 +305,8 @@ def card_payload(card_id: int, lang: str = "en") -> dict[str, Any]:
             "love": card["love"],
         }
         src = card
-    # Green-path / curated fields when present.
-    for key in ("love_long", "balanced", "unbalanced", "questions", "green_path"):
-        if src.get(key):
-            payload[key] = src[key]
-    return payload
+    # Editorial copy (short message, green path, long source) from vault published layer.
+    return merge_published(payload, card_id, lang)
 
 
 def dominant_element(cards: list[dict[str, Any]]) -> str:

@@ -30,19 +30,22 @@ git archive -o aether-for-contractor.zip HEAD \
 - טקסטים אמיתיים של מסלול ירוק / love_long
 
 ## הערה חשובה על המצב הנוכחי
-כרגע חלק מהטקסטים האמיתיים עדיין יושבים ב־`app/tarot.py`  
-(למשל `love_long`, `green_path` של השוטה/הקוסם).
 
-**לפני מסירה למתכנת:** להוציא אותם לכספת ולהשאיר ב־`tarot.py` רק טעינה מ־samples או מנתיב סביבה.
+הטקסטים הארוכים / מסלול ירוק של השוטה והקוסם הועברו ל־`content/vault/published/`.  
+`app/tarot.py` מחזיק רק שלד ציבורי וטוען תוכן דרך `app/content_loader.py`.
 
-משתנה מוצע בהמשך:
+לפני מסירה למתכנת: אל תשליחי את `content/vault/` (ראה ארכיון למטה).
+
+משתנה אופציונלי:
 ```bash
-AETHER_CONTENT_PATH=/secure/path/cards.json
+AETHER_CONTENT_PATH=/secure/path/to/content-dir
 ```
+(תיקייה עם `cards.he.json` / `cards.en.json`)
 
 ## בדיקה מהירה לפני שליחה
 ```bash
 # חייב להיכשל / לא להימצא אצל המתכנת:
 test ! -d content/vault && echo "vault absent OK" || echo "REMOVE VAULT BEFORE SHARE"
-rg -n "love_long|green_path|חוברת לימוד" app/ || true
+# שלד הקוד לא אמור להכיל love_long / green_path מוטמעים:
+rg -n "love_long|green_path" app/tarot.py && echo "FAIL: secrets still in tarot.py" || echo "tarot.py clean OK"
 ```

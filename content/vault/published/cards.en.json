@@ -1,0 +1,103 @@
+{
+  "_meta": {
+    "layer": "published",
+    "lang": "en",
+    "updated": "2026-09-05"
+  },
+  "cards": {
+    "0": {
+      "love": "An open, exciting connection. The lesson: don't run when it's time to choose. If you stay — there is somewhere to go.",
+      "traits": [
+        "adventurous",
+        "open-hearted",
+        "unburdened"
+      ],
+      "love_long": "The Fool brings air into a relationship — laughter, movement, the feeling that something new can start. At first it feels light and true. When balanced: open-hearted, gives space, keeps the bond alive. When unbalanced: freedom turns into distance; commitment feels like a cage and plans slip away. Chemistry alone is not enough — ask together: are we building a path, or only enjoying the beginning? If both want freedom and the choice to stay, this can be a living bond. If only one wants to stay and the other only wants to run forward, pain appears.",
+      "balanced": "Alive and spontaneous — freedom inside the choice to stay.",
+      "unbalanced": "Fear of commitment, escape from structure, hard to stay steady when it gets real.",
+      "green_path": {
+        "title": "Want to know more about yourselves?",
+        "intro": "",
+        "items": [
+          {
+            "id": "start",
+            "question": "Is this a real beginning between you — or only a momentary thrill?",
+            "answer": "The Fool speaks of an open start: air, laughter, the feeling that something new can begin before every answer is ready."
+          },
+          {
+            "id": "freedom",
+            "question": "Does freedom bring you closer — or farther apart?",
+            "answer": "In the Fool, freedom is strength when it lives inside the bond. It becomes weakness when it turns into escape from structure and tomorrow."
+          },
+          {
+            "id": "commitment",
+            "question": "When it's time to choose and stay — what happens?",
+            "answer": "When the Fool is balanced, there is courage to stay even without full certainty. When unbalanced, commitment feels like a cage and avoidance appears."
+          },
+          {
+            "id": "approval",
+            "question": "Are you following what feels true to you — or what looks good from outside?",
+            "answer": "The Fool calls you to follow an inner sense, even if others find it odd. In love, that means choosing the bond from truth, not pressure."
+          },
+          {
+            "id": "balance",
+            "question": "How do you keep lightness without losing reliability?",
+            "answer": "The beautiful side of the Fool is aliveness and spontaneity. The weak side is difficulty being someone who can be counted on over time."
+          },
+          {
+            "id": "path",
+            "question": "Are you building a shared path — or only enjoying the beginning?",
+            "answer": "With the Fool, chemistry alone is not enough. The potential becomes real when there is freedom and also the choice to stay."
+          }
+        ]
+      }
+    },
+    "1": {
+      "love": "You have chemistry you can shape. The lesson: don't only feel — also act. If you move together, it becomes real.",
+      "traits": [
+        "charismatic",
+        "focused",
+        "creative"
+      ],
+      "love_long": "The Magician says a bond does not only 'happen' — you can build it. You have tools: words, intention, actions, attention. Balanced: you create together, speak clearly, and turn chemistry into choice. Unbalanced: beautiful talk without follow-through, control, or impressing instead of connecting.",
+      "balanced": "Chemistry with action — creating together in clarity.",
+      "unbalanced": "Talk without action, control, or performance instead of real connection.",
+      "green_path": {
+        "title": "Want to know more about yourselves?",
+        "intro": "",
+        "items": [
+          {
+            "id": "chemistry",
+            "question": "Is your chemistry accidental — or are you creating it?",
+            "answer": "The Magician says a bond does not only happen — you can build it with intention, words, and action."
+          },
+          {
+            "id": "words",
+            "question": "Do your words connect you — or only sound good?",
+            "answer": "Chemistry in talk matters only when it continues into real follow-through."
+          },
+          {
+            "id": "focus",
+            "question": "Are you focused on each other — or scattered?",
+            "answer": "Attention is one of your tools — when it drifts, the bond thins."
+          },
+          {
+            "id": "power",
+            "question": "Is the power between you shared — or does one lead alone?",
+            "answer": "Influence can create or control. Shared will keeps the magic clean."
+          },
+          {
+            "id": "tools",
+            "question": "What are your tools as a couple?",
+            "answer": "Words, humor, initiative, presence — use what already works on purpose."
+          },
+          {
+            "id": "real",
+            "question": "Are you creating a real bond — or only an impression?",
+            "answer": "The Magician turns spark into something tangible when both choose to act."
+          }
+        ]
+      }
+    }
+  }
+}
