@@ -27,7 +27,7 @@ const state = {
   mobileThread: false,
   deferredInstall: null,
   showInstall: false,
-  union: null, // { phase: 'shuffle'|'reveal', match, partnerName }
+  union: null, // { phase, match, partnerName, showGreen }
 };
 
 const $app = document.getElementById("app");
@@ -560,6 +560,22 @@ function unionCardFace(entry, revealed) {
   </div>`;
 }
 
+function greenPathHtml(gp) {
+  if (!gp) return "";
+  const items = (gp.items || []).map((it) => `
+    <div class="green-item">
+      <div class="q">${esc(it.question || "")}</div>
+      <div class="status-line"><span class="status-dot now" title="${esc(t("statusNow"))}"></span><span>${esc(it.now || "")}</span></div>
+      <div class="status-line"><span class="status-dot fix" title="${esc(t("statusFix"))}"></span><span>${esc(it.fix || it.do || "")}</span></div>
+    </div>
+  `).join("");
+  return `<div class="green-path">
+    <h3>${esc(gp.title || t("greenPathCta"))}</h3>
+    <p class="intro">${esc(gp.intro || "")}</p>
+    ${items}
+  </div>`;
+}
+
 function unionView() {
   const u = state.union;
   if (!u) return discoverView();
@@ -570,6 +586,7 @@ function unionView() {
   }).join("");
   const partner = u.match?.partner || {};
   const shuffling = u.phase === "shuffle";
+  const gp = spread?.green_path;
   return `${navBar()}<div class="shell center union-shell">
     <p class="hero-kicker">${esc(t("unionTogether"))}</p>
     <h1>${esc(shuffling ? t("unionShuffling") : t("unionReveal"))}</h1>
@@ -584,7 +601,9 @@ function unionView() {
       <div class="card-panel union-message">
         <div class="score">${Math.round(u.match.compatibility_score)}%</div>
         <p class="insight">${esc(spread?.message || u.match.mystical_reasoning || "")}</p>
+        ${u.showGreen && gp ? greenPathHtml(gp) : ""}
         <div class="actions" style="justify-content:center">
+          ${gp && !u.showGreen ? `<button class="ghost" id="union-green">${esc(t("greenPathCta"))}</button>` : ""}
           <button class="primary" id="union-to-chat">${esc(t("unionOpenChat"))}</button>
         </div>
       </div>

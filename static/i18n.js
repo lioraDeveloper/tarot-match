@@ -109,6 +109,9 @@ const I18N = {
     unionOpenChat: "Continue to chat",
     unionTogether: "For both of you",
     sharedCards: "Shared cards",
+    greenPathCta: "Want to know more about yourselves?",
+    statusNow: "Now",
+    statusFix: "Fix",
     cards: {
       0: "The Fool",
       1: "The Magician",
@@ -244,6 +247,9 @@ const I18N = {
     unionOpenChat: "להמשיך לצ׳אט",
     unionTogether: "לשני הצדדים",
     sharedCards: "קלפים משותפים",
+    greenPathCta: "רוצים להכיר אתכם יותר?",
+    statusNow: "עכשיו",
+    statusFix: "לתקן",
     cards: {
       0: "הכסיל",
       1: "הקוסם",
