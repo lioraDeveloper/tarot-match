@@ -17,8 +17,9 @@ B. (ריק — להוסיף כאן גרסאות נוספות בלי לגעת ב�
 ראו `message-options.md` ו־`published/cards.he.json`.
 
 ## מסלול ירוק
-עדיין **מושהה** במוצר.  
-הגרסה הישנה מסומנת `draft-in-use` ב־`published/cards.he.json`.
+**בבנייה מחדש** לפי קונספט מדריך NLP.  
+מסמך כיוון: `green-path-nlp-guide.md`  
+הגרסה הישנה ב־`published` עדיין מסומנת `draft-in-use` — לא נעולה.
 
 ## מה הסוכן מותר לעשות כאן
 - לקרוא `source/` כדי להבין
