@@ -562,16 +562,17 @@ function unionCardFace(entry, revealed) {
 
 function greenPathHtml(gp) {
   if (!gp) return "";
-  const items = (gp.items || []).map((it) => `
+  const items = (gp.items || []).map((it) => {
+    const body = it.answer || it.guidance || it.fix || it.do || it.now || "";
+    return `
     <div class="green-item">
       <div class="q">${esc(it.question || "")}</div>
-      <div class="status-line"><span class="status-dot now" title="${esc(t("statusNow"))}"></span><span>${esc(it.now || "")}</span></div>
-      <div class="status-line"><span class="status-dot fix" title="${esc(t("statusFix"))}"></span><span>${esc(it.fix || it.do || "")}</span></div>
-    </div>
-  `).join("");
+      ${body ? `<p class="body">${esc(body)}</p>` : ""}
+    </div>`;
+  }).join("");
   return `<div class="green-path">
     <h3>${esc(gp.title || t("greenPathCta"))}</h3>
-    <p class="intro">${esc(gp.intro || "")}</p>
+    ${gp.intro ? `<p class="intro">${esc(gp.intro)}</p>` : ""}
     ${items}
   </div>`;
 }

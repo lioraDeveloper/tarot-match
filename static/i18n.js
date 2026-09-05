@@ -110,8 +110,6 @@ const I18N = {
     unionTogether: "For both of you",
     sharedCards: "Shared cards",
     greenPathCta: "Want to know more about yourselves?",
-    statusNow: "Now",
-    statusFix: "Fix",
     cards: {
       0: "The Fool",
       1: "The Magician",
@@ -248,8 +246,6 @@ const I18N = {
     unionTogether: "לשני הצדדים",
     sharedCards: "קלפים משותפים",
     greenPathCta: "רוצים להכיר אתכם יותר?",
-    statusNow: "עכשיו",
-    statusFix: "לתקן",
     cards: {
       0: "השוטה",
       1: "הקוסם",

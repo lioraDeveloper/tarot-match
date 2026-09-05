@@ -32,10 +32,7 @@ MAJOR_ARCANA: list[dict[str, Any]] = [
         "unbalanced": "Fear of commitment, escape from structure, hard to stay steady when it gets real.",
         "green_path": {
             "title": "Want to know more about yourselves?",
-            "intro": (
-                "We turned the Fool's relationship energy into a clear path: "
-                "question → answer → where you are now → what to do."
-            ),
+            "intro": "",
             "items": [
                 {
                     "id": "start",
@@ -44,8 +41,6 @@ MAJOR_ARCANA: list[dict[str, Any]] = [
                         "The Fool speaks of an open start: air, laughter, the feeling that something "
                         "new can begin before every answer is ready."
                     ),
-                    "now": "You are in a spark-and-beginning stage. The bond feels light and open.",
-                    "do": "Let the excitement breathe — and ask together if both of you want to build from it.",
                 },
                 {
                     "id": "freedom",
@@ -54,8 +49,6 @@ MAJOR_ARCANA: list[dict[str, Any]] = [
                         "In the Fool, freedom is strength when it lives inside the bond. "
                         "It becomes weakness when it turns into escape from structure and tomorrow."
                     ),
-                    "now": "Check whether the space between you feels safe — or like avoidance.",
-                    "do": "Set one simple shared boundary: what is free for you, and what already counts as running.",
                 },
                 {
                     "id": "commitment",
@@ -64,8 +57,6 @@ MAJOR_ARCANA: list[dict[str, Any]] = [
                         "When the Fool is balanced, there is courage to stay even without full certainty. "
                         "When unbalanced, commitment feels like a cage and avoidance appears."
                     ),
-                    "now": "You are in the test between 'let's flow' and 'we choose to stay'.",
-                    "do": "Make one small clear choice for the coming week — a plan, a talk, or a promise you both keep.",
                 },
                 {
                     "id": "approval",
@@ -74,8 +65,6 @@ MAJOR_ARCANA: list[dict[str, Any]] = [
                         "The Fool calls you to follow an inner sense, even if others find it odd. "
                         "In love, that means choosing the bond from truth, not pressure."
                     ),
-                    "now": "Notice whether your choices come from the heart — or from fear of what people will say.",
-                    "do": "Each say one sentence: why I truly choose you.",
                 },
                 {
                     "id": "balance",
@@ -84,8 +73,6 @@ MAJOR_ARCANA: list[dict[str, Any]] = [
                         "The beautiful side of the Fool is aliveness and spontaneity. "
                         "The weak side is difficulty being someone who can be counted on over time."
                     ),
-                    "now": "If there is chemistry but little stability — that is exactly this card's tension.",
-                    "do": "Keep the play, and add one steady anchor: a fixed time, a clear message, or a small plan.",
                 },
                 {
                     "id": "path",
@@ -94,8 +81,6 @@ MAJOR_ARCANA: list[dict[str, Any]] = [
                         "With the Fool, chemistry alone is not enough. "
                         "The potential becomes real when there is freedom and also the choice to stay."
                     ),
-                    "now": "This is the moment to understand where this connection is going for you.",
-                    "do": "Answer together in one sentence: 'We want to build ___ together.' Then take one small step toward it.",
                 },
             ],
         },
@@ -117,43 +102,40 @@ MAJOR_ARCANA: list[dict[str, Any]] = [
         "unbalanced": "Talk without action, control, or performance instead of real connection.",
         "green_path": {
             "title": "Want to know more about yourselves?",
-            "intro": "Each topic in two lines: orange = where you are now · green = what to fix.",
+            "intro": "",
             "items": [
                 {
                     "id": "chemistry",
                     "question": "Is your chemistry accidental — or are you creating it?",
-                    "now": "There is spark and pull, but it is not yet clear if both of you are building it on purpose.",
-                    "fix": "Choose one small act together that creates closeness — don't only wait for it to 'happen'.",
+                    "answer": (
+                        "The Magician says a bond does not only happen — you can build it "
+                        "with intention, words, and action."
+                    ),
                 },
                 {
                     "id": "words",
                     "question": "Do your words connect you — or only sound good?",
-                    "now": "There is chemistry in conversation, sometimes without continuation in reality.",
-                    "fix": "Turn one sentence into a small promise you both keep this week.",
+                    "answer": "Chemistry in talk matters only when it continues into real follow-through.",
                 },
                 {
                     "id": "focus",
                     "question": "Are you focused on each other — or scattered?",
-                    "now": "There is interest, but attention sometimes drifts elsewhere.",
-                    "fix": "Give the bond one focused time this week — no phone, no distractions.",
+                    "answer": "Attention is one of your tools — when it drifts, the bond thins.",
                 },
                 {
                     "id": "power",
                     "question": "Is the power between you shared — or does one lead alone?",
-                    "now": "There is a dynamic of influence; check whether it is respectful or controlling.",
-                    "fix": "Ask together: who is leading now — and how do we make room for both voices.",
+                    "answer": "Influence can create or control. Shared will keeps the magic clean.",
                 },
                 {
                     "id": "tools",
                     "question": "What are your tools as a couple?",
-                    "now": "You have skills to connect: talk, humor, initiative — you don't always use them.",
-                    "fix": "Pick one tool that already works for you — and amplify it on purpose.",
+                    "answer": "Words, humor, initiative, presence — use what already works on purpose.",
                 },
                 {
                     "id": "real",
                     "question": "Are you creating a real bond — or only an impression?",
-                    "now": "There is strong potential to turn chemistry into something tangible.",
-                    "fix": "Take one concrete step: a plan, a deeper conversation, or a clear choice to continue.",
+                    "answer": "The Magician turns spark into something tangible when both choose to act.",
                 },
             ],
         },
@@ -395,43 +377,55 @@ HE_CARDS = {
         "unbalanced": "פחד ממחויבות, בריחה ממסגרת, קושי להיות יציב כשזה נהיה רציני.",
         "green_path": {
             "title": "רוצים להכיר אתכם יותר?",
-            "intro": "כל נושא בשתי שורות: כתום = איפה אתם עכשיו · ירוק = מה לתקן.",
+            "intro": "",
             "items": [
                 {
                     "id": "start",
                     "question": "התחלה אמיתית או רק ריגוש?",
-                    "now": "יש ביניכם ניצוץ פתוח והתחלה קלה.",
-                    "fix": "בדקו יחד אם שניכם רוצים לבנות מזה משהו — לא רק להתרגש.",
+                    "answer": (
+                        "השוטה מדבר על התחלה פתוחה: אוויר, צחוק, תחושה שמשהו חדש "
+                        "יכול להתחיל עוד לפני שיש את כל התשובות."
+                    ),
                 },
                 {
                     "id": "freedom",
                     "question": "החופש מחבר או מרחיק?",
-                    "now": "יש מרחב בקשר — לפעמים זה מרגיש חופשי, לפעמים כמו מרחק.",
-                    "fix": "הגדירו מה אצלכם חופש בריא, ומה כבר נחשב בריחה.",
+                    "answer": (
+                        "אצל השוטה חופש הוא כוח כשהוא חי בתוך הקשר. "
+                        "הוא נחלש כשהוא הופך לבריחה ממסגרת וממחר."
+                    ),
                 },
                 {
                     "id": "commitment",
                     "question": "כשצריך להישאר — מה קורה?",
-                    "now": "אתם בין «נזרום» לבין בחירה אמיתית להישאר.",
-                    "fix": "עשו בחירה קטנה לשבוע: תוכנית, שיחה, או הבטחה ששניכם עומדים בה.",
+                    "answer": (
+                        "כשהשוטה מאוזן — יש אומץ להישאר גם בלי ודאות מלאה. "
+                        "כשהוא לא מאוזן — מחויבות מרגישה כמו כלוב ומופיעה התחמקות."
+                    ),
                 },
                 {
                     "id": "approval",
                     "question": "בוחרים מלב או ממה שייראה טוב?",
-                    "now": "חלק מהבחירות מגיעות מחיבור אמיתי — וחלק מלחץ חיצוני.",
-                    "fix": "כל אחד יגיד למה הוא באמת בוחר בשני — בלי קהל מבחוץ.",
+                    "answer": (
+                        "השוטה קורא ללכת אחרי תחושה פנימית, גם אם מבחוץ זה נראה מוזר. "
+                        "באהבה זה אומר לבחור בקשר מתוך אמת, לא מלחץ."
+                    ),
                 },
                 {
                     "id": "balance",
-                    "question": "קלילות בלי לאבד אמינות",
-                    "now": "יש כימיה וקלילות, אבל היציבות עוד לא יציבה מספיק.",
-                    "fix": "שמרו על המשחק, ותוסיפו עוגן אחד קבוע ביניכם.",
+                    "question": "איך שומרים על קלילות בלי לאבד אמינות?",
+                    "answer": (
+                        "הצד היפה של השוטה הוא חיות וספונטניות. "
+                        "הצד החלש הוא קושי להיות מישהו שאפשר לסמוך עליו לאורך זמן."
+                    ),
                 },
                 {
                     "id": "path",
                     "question": "בונים דרך או רק נהנים מההתחלה?",
-                    "now": "הקשר עדיין יותר התחלה מאשר דרך ברורה.",
-                    "fix": "כתבו יחד: «אנחנו רוצים לבנות ___» — ועשו צעד קטן אחד לשם.",
+                    "answer": (
+                        "עם השוטה כימיה לבד לא מספיקה. "
+                        "הפוטנציאל נהיה אמיתי כשיש גם חופש וגם בחירה להישאר."
+                    ),
                 },
             ],
         },
@@ -450,43 +444,37 @@ HE_CARDS = {
         "unbalanced": "דיבור בלי מעשה, שליטה, או הצגה במקום חיבור אמיתי.",
         "green_path": {
             "title": "רוצים להכיר אתכם יותר?",
-            "intro": "כל נושא בשתי שורות: כתום = איפה אתם עכשיו · ירוק = מה לתקן.",
+            "intro": "",
             "items": [
                 {
                     "id": "chemistry",
                     "question": "הכימיה אצלכם מקרית — או שאתם יוצרים אותה?",
-                    "now": "יש משיכה וניצוץ, אבל עוד לא ברור אם שניכם בונים אותה בכוונה.",
-                    "fix": "בחרו יחד מעשה קטן אחד שיוצר קרבה — לא רק מחכים ש«זה יקרה».",
+                    "answer": "הקוסם אומר שהקשר לא רק «קורה» — אפשר לבנות אותו עם כוונה, מילים ומעשה.",
                 },
                 {
                     "id": "words",
                     "question": "המילים שלכם מחברות — או רק נשמעות יפות?",
-                    "now": "יש שיחות וכימיה במילים, לפעמים בלי המשך במציאות.",
-                    "fix": "הפכו משפט אחד להבטחה קטנה ששניכם מקיימים השבוע.",
+                    "answer": "כימיה בדיבור חשובה רק כשיש לה המשך במציאות.",
                 },
                 {
                     "id": "focus",
                     "question": "אתם ממוקדים אחד בשני — או מפוזרים?",
-                    "now": "יש עניין, אבל תשומת הלב לפעמים בורחת למקומות אחרים.",
-                    "fix": "תנו לקשר זמן ממוקד אחד השבוע — בלי טלפון, בלי הסחות.",
+                    "answer": "תשומת לב היא אחד מהכלים שלכם — כשהיא בורחת, הקשר נחלש.",
                 },
                 {
                     "id": "power",
                     "question": "הכוח ביניכם משותף — או שאחד מנהל?",
-                    "now": "יש דינמיקה של השפעה; חשוב לבדוק אם היא מכבדת או שולטת.",
-                    "fix": "שאלו יחד: מי מוביל עכשיו — ואיך עושים מקום לשני הקולות.",
+                    "answer": "השפעה יכולה ליצור או לשלוט. רצון משותף שומר על הקסם נקי.",
                 },
                 {
                     "id": "tools",
                     "question": "מה הכלים שלכם כזוג?",
-                    "now": "יש לכם כישורים לחבר: דיבור, הומור, יוזמה — לא תמיד משתמשים בהם.",
-                    "fix": "בחרו כלי אחד שכבר עובד אצלכם — והגבירו אותו במודע.",
+                    "answer": "מילים, הומור, יוזמה, נוכחות — להשתמש במודע במה שכבר עובד.",
                 },
                 {
                     "id": "real",
                     "question": "אתם יוצרים קשר אמיתי — או רק רושם?",
-                    "now": "יש פוטנציאל חזק להפוך כימיה למשהו ממשי.",
-                    "fix": "עשו צעד אחד מוחשי: תוכנית, הכרות עמוקה יותר, או בחירה ברורה להמשיך.",
+                    "answer": "הקוסם הופך ניצוץ למשהו ממשי כששניכם בוחרים לפעול.",
                 },
             ],
         },
