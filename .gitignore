@@ -13,3 +13,9 @@ static/uploads/*
 !static/uploads/.gitkeep
 !static/uploads/portraits/
 !static/uploads/portraits/*.svg
+
+# Content vault: keep tracked for owner/agent work.
+# Before sharing a branch with an external contractor, either:
+# 1) uncomment the next line and commit on a contractor branch, or
+# 2) use docs/contractor-handoff.md (git archive excluding content/vault)
+# content/vault/

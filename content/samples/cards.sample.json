@@ -1,0 +1,30 @@
+[
+  {
+    "id": 0,
+    "name_en": "The Fool",
+    "name_he": "השוטה",
+    "love_short": "[SAMPLE] Short placeholder message for development only.",
+    "love_long": "[SAMPLE] Long internal text placeholder — replace from vault.",
+    "balanced": "[SAMPLE] Balanced placeholder.",
+    "unbalanced": "[SAMPLE] Unbalanced placeholder.",
+    "traits": ["sample", "placeholder"],
+    "green_path": {
+      "title": "[SAMPLE] Want to know more?",
+      "intro": "",
+      "items": [
+        {
+          "id": "sample-1",
+          "question": "[SAMPLE] Example question?",
+          "answer": "[SAMPLE] Example guidance."
+        }
+      ]
+    }
+  },
+  {
+    "id": 1,
+    "name_en": "The Magician",
+    "name_he": "הקוסם",
+    "love_short": "[SAMPLE] Short placeholder for Magician.",
+    "traits": ["sample"]
+  }
+]

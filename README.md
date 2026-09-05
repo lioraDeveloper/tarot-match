@@ -61,6 +61,15 @@ python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 Set `OPENAI_API_KEY` if you want live interpretations. Without it, the local oracle generates archetypes, profiles, and cosmic insights (keeps the draw under 3 seconds).
 
+## תוכן סודי מול מתכנת
+
+הפרדת כספת התוכן (חומר ספר / מסלול ירוק) מקוד האפליקציה:
+
+- ארכיטקטורה: [`docs/content-vault-architecture.md`](docs/content-vault-architecture.md)
+- מסירה למתכנת: [`docs/contractor-handoff.md`](docs/contractor-handoff.md)
+- כספת (רק לך): `content/vault/`
+- למתכנת: `content/schema/` + `content/samples/`
+
 ## Stack
 
 - FastAPI + SQLite (schema matches the PostgreSQL blueprint: `users`, `matches`, `messages`)
