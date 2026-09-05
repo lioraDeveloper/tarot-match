@@ -534,14 +534,14 @@ def interpret_union_spread(
             entry["green_path"] = card["green_path"]
         cards.append(entry)
     bond, lesson, path = drawn
-    # Product v1: short clear message + chemistry % (green path paused).
+    # Product v1: short clear message + connection % (green path paused).
     if lang == "he":
         message = f"{bond['love']} {lesson['love']} {path['love']}"
-        headline = f"{int(round(score))}% כימיה"
+        headline = f"{int(round(score))}% חיבור"
         subtitle = "מסר קצר על החיבור שלכם"
     else:
         message = f"{bond['love']} {lesson['love']} {path['love']}"
-        headline = f"{int(round(score))}% chemistry"
+        headline = f"{int(round(score))}% connection"
         subtitle = "A short read on your connection"
     return {
         "card_ids": card_ids,
