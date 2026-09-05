@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aether.local/schemas/card-content.schema.json",
+  "title": "AetherCardContent",
+  "description": "Shape of one Major Arcana card content record. No real book text belongs in the public repo — only this shape + samples.",
+  "type": "object",
+  "required": ["id", "name_en", "name_he", "love_short"],
+  "properties": {
+    "id": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 21,
+      "description": "Major Arcana id"
+    },
+    "name_en": { "type": "string" },
+    "name_he": { "type": "string" },
+    "love_short": {
+      "type": "string",
+      "description": "Short match message shown after reveal"
+    },
+    "love_long": {
+      "type": "string",
+      "description": "INTERNAL long source text — vault only; never ship to client unless product decides"
+    },
+    "balanced": { "type": "string" },
+    "unbalanced": { "type": "string" },
+    "traits": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "green_path": {
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "intro": { "type": "string" },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "question": { "type": "string" },
+              "answer": { "type": "string" }
+            },
+            "required": ["id", "question"]
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

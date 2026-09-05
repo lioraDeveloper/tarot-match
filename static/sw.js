@@ -1,11 +1,11 @@
 /* Aether PWA — cache shell; always network for API/WS */
-const CACHE = "aether-shell-v1";
+const CACHE = "aether-shell-v2";
 const SHELL = [
   "/",
-  "/static/styles.css?v=8",
-  "/static/i18n.js?v=8",
-  "/static/cards.js?v=8",
-  "/static/app.js?v=8",
+  "/static/styles.css?v=9",
+  "/static/i18n.js?v=9",
+  "/static/cards.js?v=9",
+  "/static/app.js?v=9",
   "/static/icons/icon-192.png",
   "/static/icons/icon-512.png",
   "/static/manifest.webmanifest",

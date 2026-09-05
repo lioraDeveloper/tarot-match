@@ -2,12 +2,18 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
+import random
 import urllib.error
 import urllib.request
 from typing import Any
 
+from app.content_loader import merge_published
+
+# Public skeleton only. Secret / editorial copy lives in content/vault/published
+# (source + drafts are for study; app never auto-loads them).
 MAJOR_ARCANA: list[dict[str, Any]] = [
     {
         "id": 0,
@@ -15,15 +21,15 @@ MAJOR_ARCANA: list[dict[str, Any]] = [
         "element": "Air",
         "keywords": ["beginnings", "leap", "trust"],
         "traits": ["adventurous", "open-hearted", "unburdened"],
-        "love": "A first spark that asks for courage more than certainty.",
+        "love": "An open beginning.",
     },
     {
         "id": 1,
         "name": "The Magician",
         "element": "Air",
         "keywords": ["will", "manifestation", "skill"],
-        "traits": ["charismatic", "focused", "resourceful"],
-        "love": "Chemistry you can actually shape into something real.",
+        "traits": ["charismatic", "focused", "creative"],
+        "love": "Chemistry you can shape.",
     },
     {
         "id": 2,
@@ -203,6 +209,20 @@ POSITION_LABELS = {
     },
 }
 
+UNION_POSITIONS = ("bond", "lesson", "path")
+UNION_POSITION_LABELS = {
+    "en": {
+        "bond": "Our bond",
+        "lesson": "What we learn together",
+        "path": "Where this leads",
+    },
+    "he": {
+        "bond": "החיבור שלנו",
+        "lesson": "מה נלמד יחד",
+        "path": "לאן זה מוביל",
+    },
+}
+
 ARCHETYPE_BY_ELEMENT = {
     "en": {
         "Fire": "Fire · Passion",
@@ -226,9 +246,11 @@ ARCHETYPE_BY_ELEMENT = {
 
 ELEMENT_HE = {"Fire": "אש", "Water": "מים", "Air": "אוויר", "Earth": "אדמה"}
 
+# Public Hebrew skeleton only. Editorial copy (love / green_path / long) loads from vault published.
+# Public Hebrew skeleton only. Editorial copy loads from content/vault/published.
 HE_CARDS = {
-    0: {"name": "הכסיל", "love": "ניצוץ ראשון שמבקש אומץ יותר מוודאות.", "traits": ["הרפתקני", "לב פתוח", "נטול משא"]},
-    1: {"name": "הקוסם", "love": "כימיה שאפשר ממש לעצב למשהו אמיתי.", "traits": ["כריזמטי", "ממוקד", "תושייה"]},
+    0: {"name": "השוטה", "love": "התחלה פתוחה.", "traits": ["לב פתוח", "ספונטני", "מחפש חופש"]},
+    1: {"name": "הקוסם", "love": "כימיה שאפשר לעצב.", "traits": ["כריזמטי", "ממוקד", "יוצר"]},
     2: {"name": "הכהנת הגדולה", "love": "משיכה שחיה במבטים, בחלומות ובתזמון.", "traits": ["אינטואיטיבי", "שמור", "מגנטי"]},
     3: {"name": "הקיסרית", "love": "אהבה שרוצה מגע, חום, ומי שמשקיע.", "traits": ["חמים", "חושני", "יצירתי"]},
     4: {"name": "הקיסר", "love": "ביטחון כשפת אהבה — עמוד שדרה לתשוקה.", "traits": ["יציב", "מגן", "החלטי"]},
@@ -262,7 +284,7 @@ def card_payload(card_id: int, lang: str = "en") -> dict[str, Any]:
     card = CARD_BY_ID[card_id]
     he = HE_CARDS[card_id]
     if lang == "he":
-        return {
+        payload = {
             "id": card["id"],
             "name": he["name"],
             "element": ELEMENT_HE[card["element"]],
@@ -271,15 +293,20 @@ def card_payload(card_id: int, lang: str = "en") -> dict[str, Any]:
             "traits": he["traits"],
             "love": he["love"],
         }
-    return {
-        "id": card["id"],
-        "name": card["name"],
-        "element": card["element"],
-        "element_key": card["element"],
-        "keywords": card["keywords"],
-        "traits": card["traits"],
-        "love": card["love"],
-    }
+        src = he
+    else:
+        payload = {
+            "id": card["id"],
+            "name": card["name"],
+            "element": card["element"],
+            "element_key": card["element"],
+            "keywords": card["keywords"],
+            "traits": card["traits"],
+            "love": card["love"],
+        }
+        src = card
+    # Editorial copy (short message, green path, long source) from vault published layer.
+    return merge_published(payload, card_id, lang)
 
 
 def dominant_element(cards: list[dict[str, Any]]) -> str:
@@ -451,6 +478,89 @@ def _maybe_llm_interpret(signature: dict[str, Any], spread: dict[str, Any], lang
     except (urllib.error.URLError, TimeoutError, KeyError, json.JSONDecodeError, ValueError):
         pass
     return {"energy_signature": signature, "last_spread": spread}
+
+
+def pick_union_card_ids(sig_a: dict[str, Any] | None, sig_b: dict[str, Any] | None, pair_key: str) -> list[int]:
+    """Deterministic three-card draw for a pair — same cards for both people."""
+    seed = int(hashlib.sha256(pair_key.encode("utf-8")).hexdigest()[:12], 16)
+    rng = random.Random(seed)
+    a_cards = list((sig_a or {}).get("card_ids") or [])
+    b_cards = list((sig_b or {}).get("card_ids") or [])
+    chosen: list[int] = []
+    if a_cards:
+        chosen.append(a_cards[rng.randrange(len(a_cards))])
+    if b_cards:
+        pool_b = [c for c in b_cards if c not in chosen] or b_cards
+        pick = pool_b[rng.randrange(len(pool_b))]
+        if pick not in chosen:
+            chosen.append(pick)
+    bridges = [6, 14, 17, 19, 21, 8, 10, 3]
+    while len(chosen) < 3:
+        pool = [c for c in bridges if c not in chosen] or [i for i in range(22) if i not in chosen]
+        chosen.append(pool[rng.randrange(len(pool))])
+    return chosen[:3]
+
+
+def interpret_union_spread(
+    card_ids: list[int],
+    name_a: str,
+    name_b: str,
+    score: float,
+    lang: str = "en",
+) -> dict[str, Any]:
+    """Shared three-card reading both people learn together on a match."""
+    lang = normalize_lang(lang)
+    if len(card_ids) != 3 or len(set(card_ids)) != 3:
+        raise ValueError("Union spread needs three distinct cards.")
+    drawn = [card_payload(cid, lang) for cid in card_ids]
+    labels = UNION_POSITION_LABELS[lang]
+    cards = []
+    for pos, card in zip(UNION_POSITIONS, drawn):
+        entry = {
+            "position": pos,
+            "label": labels[pos],
+            "card": card,
+            "teach": card["love"],
+        }
+        if card.get("love_long"):
+            entry["teach_long"] = card["love_long"]
+        if card.get("questions"):
+            entry["questions"] = card["questions"]
+        if card.get("balanced"):
+            entry["balanced"] = card["balanced"]
+        if card.get("unbalanced"):
+            entry["unbalanced"] = card["unbalanced"]
+        if card.get("green_path"):
+            entry["green_path"] = card["green_path"]
+        cards.append(entry)
+    bond, lesson, path = drawn
+    # Product v1: short clear message + connection % (green path paused).
+    if lang == "he":
+        message = f"{bond['love']} {lesson['love']} {path['love']}"
+        headline = f"{int(round(score))}% חיבור"
+        subtitle = "מסר קצר על החיבור שלכם"
+    else:
+        message = f"{bond['love']} {lesson['love']} {path['love']}"
+        headline = f"{int(round(score))}% connection"
+        subtitle = "A short read on your connection"
+    return {
+        "card_ids": card_ids,
+        "cards": cards,
+        "headline": headline,
+        "subtitle": subtitle,
+        "message": message,
+        "score": float(score),
+        "lang": lang,
+    }
+
+
+def localize_union_spread(stored: dict[str, Any] | None, name_a: str, name_b: str, score: float, lang: str) -> dict[str, Any] | None:
+    if not stored:
+        return None
+    ids = stored.get("card_ids")
+    if not ids or len(ids) != 3:
+        return None
+    return interpret_union_spread(ids, name_a, name_b, score, lang=lang)
 
 
 def compatibility(a: dict[str, Any], b: dict[str, Any], lang: str = "en") -> tuple[float, str]:
