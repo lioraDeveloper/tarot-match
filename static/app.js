@@ -296,7 +296,6 @@ function authForm(mode) {
             <select name="gender" required>
               <option value="woman">${esc(t("woman"))}</option>
               <option value="man">${esc(t("man"))}</option>
-              <option value="nonbinary">${esc(t("nonbinary"))}</option>
             </select>
           </div>
         </div>
@@ -304,7 +303,6 @@ function authForm(mode) {
         <div class="check-row">
           <label><input type="checkbox" name="looking" value="woman" checked /> ${esc(t("women"))}</label>
           <label><input type="checkbox" name="looking" value="man" checked /> ${esc(t("men"))}</label>
-          <label><input type="checkbox" name="looking" value="nonbinary" /> ${esc(t("nonbinary"))}</label>
           <label><input type="checkbox" name="looking" value="any" /> ${esc(t("anyone"))}</label>
         </div>
         <label>${esc(t("ageRangeSeek"))}</label>
@@ -499,7 +497,7 @@ function discoverView() {
 function profileView() {
   const u = state.user;
   const sig = u.energy_signature;
-  const genderLabel = { woman: t("woman"), man: t("man"), nonbinary: t("nonbinary"), any: t("anyone") };
+  const genderLabel = { woman: t("woman"), man: t("man"), any: t("anyone") };
   return `${navBar()}<div class="shell grid-2">
     <div class="card-panel">
       <p class="hero-kicker">${esc(t("yourField"))}</p>
@@ -525,7 +523,7 @@ function profileView() {
         </div>
         <label>${esc(t("lookingFor"))}</label>
         <div class="check-row">
-          ${["woman","man","nonbinary","any"].map((g) => `<label><input type="checkbox" name="looking" value="${g}" ${u.looking_for_gender.includes(g) ? "checked" : ""} /> ${esc(genderLabel[g])}</label>`).join("")}
+          ${["woman","man","any"].map((g) => `<label><input type="checkbox" name="looking" value="${g}" ${u.looking_for_gender.includes(g) ? "checked" : ""} /> ${esc(genderLabel[g])}</label>`).join("")}
         </div>
         <p class="${state.error === t("saved") ? "ok" : "error"}">${esc(state.error)}</p>
         <div class="actions"><button class="primary" type="submit">${esc(t("savePrefs"))}</button></div>
