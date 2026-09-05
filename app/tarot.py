@@ -534,25 +534,15 @@ def interpret_union_spread(
             entry["green_path"] = card["green_path"]
         cards.append(entry)
     bond, lesson, path = drawn
-    green = next((c.get("green_path") for c in drawn if c.get("green_path")), None)
+    # Product v1: short clear message + chemistry % (green path paused).
     if lang == "he":
-        message = (
-            f"{name_a} ו{name_b} — החיבור שלכם נפרש בשלושה קלפים שנלמדים יחד. "
-            f"{labels['bond']}: {bond['name']} — {bond['love']} "
-            f"{labels['lesson']}: {lesson['name']} — {lesson['love']} "
-            f"{labels['path']}: {path['name']} — {path['love']}"
-        )
-        headline = f"שלושה קלפים בשבילכם · {int(round(score))}%"
-        subtitle = "הקלפים האלה שייכים לשני הצדדים — ללמוד אותם יחד, ואז לדבר."
+        message = f"{bond['love']} {lesson['love']} {path['love']}"
+        headline = f"{int(round(score))}% כימיה"
+        subtitle = "מסר קצר על החיבור שלכם"
     else:
-        message = (
-            f"{name_a} & {name_b} — your match unfolds in three cards you learn together. "
-            f"{labels['bond']}: {bond['name']} — {bond['love']} "
-            f"{labels['lesson']}: {lesson['name']} — {lesson['love']} "
-            f"{labels['path']}: {path['name']} — {path['love']}"
-        )
-        headline = f"Three cards for both of you · {int(round(score))}%"
-        subtitle = "These cards belong to both of you — learn them together, then talk."
+        message = f"{bond['love']} {lesson['love']} {path['love']}"
+        headline = f"{int(round(score))}% chemistry"
+        subtitle = "A short read on your connection"
     return {
         "card_ids": card_ids,
         "cards": cards,
@@ -561,7 +551,6 @@ def interpret_union_spread(
         "message": message,
         "score": float(score),
         "lang": lang,
-        "green_path": green,
     }
 
 

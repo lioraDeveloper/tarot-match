@@ -634,7 +634,14 @@ html[dir="rtl"] .union-meta .pos { text-transform: none; letter-spacing: 0.02em;
 .union-meta .picked { font-family: var(--font); font-size: 0.9rem; margin-top: 0.15rem; }
 .union-teach { font-size: 0.78rem; line-height: 1.35; margin: 0.25rem 0 0; }
 .union-message { text-align: start; margin-top: 0.5rem; }
-.union-message .score { text-align: center; margin-bottom: 0.4rem; }
+.union-message .score { text-align: center; margin-bottom: 0.15rem; }
+.union-message .score-label {
+  text-align: center;
+  color: var(--gold);
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.65rem;
+}
 .green-path { margin-top: 1rem; text-align: start; }
 .green-path h3 { margin: 0 0 0.35rem; font-size: 1.05rem; color: var(--gold); }
 .green-path .intro { color: var(--muted); font-size: 0.88rem; margin-bottom: 0.8rem; }

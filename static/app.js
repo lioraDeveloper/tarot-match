@@ -587,7 +587,6 @@ function unionView() {
   }).join("");
   const partner = u.match?.partner || {};
   const shuffling = u.phase === "shuffle";
-  const gp = spread?.green_path;
   return `${navBar()}<div class="shell center union-shell">
     <p class="hero-kicker">${esc(t("unionTogether"))}</p>
     <h1>${esc(shuffling ? t("unionShuffling") : t("unionReveal"))}</h1>
@@ -601,10 +600,9 @@ function unionView() {
     ${u.phase === "reveal" && u.revealedCount >= 3 ? `
       <div class="card-panel union-message">
         <div class="score">${Math.round(u.match.compatibility_score)}%</div>
+        <div class="score-label">${esc(t("chemistry"))}</div>
         <p class="insight">${esc(spread?.message || u.match.mystical_reasoning || "")}</p>
-        ${u.showGreen && gp ? greenPathHtml(gp) : ""}
         <div class="actions" style="justify-content:center">
-          ${gp && !u.showGreen ? `<button class="ghost" id="union-green">${esc(t("greenPathCta"))}</button>` : ""}
           <button class="primary" id="union-to-chat">${esc(t("unionOpenChat"))}</button>
         </div>
       </div>
@@ -773,12 +771,6 @@ function bind() {
       state.view = "discover";
       render();
     }
-  });
-  const unionGreen = document.getElementById("union-green");
-  if (unionGreen) unionGreen.addEventListener("click", () => {
-    if (!state.union) return;
-    state.union.showGreen = true;
-    render();
   });
 }
 
